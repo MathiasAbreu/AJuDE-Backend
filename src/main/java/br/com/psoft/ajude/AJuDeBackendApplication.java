@@ -1,4 +1,4 @@
-package br.com.psoft.ajude.AJuDE.Backend;
+package br.com.psoft.ajude;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class AJuDeBackendApplication {
 
 	public static void main(String[] args) {
+
 		SpringApplication.run(AJuDeBackendApplication.class, args);
 	}
 
