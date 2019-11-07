@@ -1,6 +1,8 @@
 package br.com.psoft.ajude.entities;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -8,17 +10,22 @@ import javax.persistence.Id;
 @Entity
 public class Usuario {
 
-    @Id
-    private String email;
-
+    @Getter @Setter
     private String nome;
+    @Getter @Setter
     private String ultimoNome;
 
-    private long numeroCartao;
-    private int senhaCartao;
+    @Getter @Setter @Id
+    private String email;
+
+    @Getter @Setter
+    private String numeroCartao;
+
+    @Getter @Setter
+    private String senha;
 
     @JsonCreator
-    public Usuario(String nome, String ultimoNome, String email, long numeroCartao, int senhaCartao) {
+    public Usuario(String nome, String ultimoNome, String email, String numeroCartao, String senha) {
 
         super();
 
@@ -26,12 +33,11 @@ public class Usuario {
         this.ultimoNome = ultimoNome;
         this.email = email;
         this.numeroCartao = numeroCartao;
-        this.senhaCartao = senhaCartao;
+        this.senha = senha;
 
     }
 
-    @JsonCreator
-    public Usuario() {
-        super();
+    public String getEmail() {
+        return email;
     }
 }

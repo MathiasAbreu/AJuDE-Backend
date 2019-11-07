@@ -8,4 +8,6 @@ public class UserAlreadyExistException extends Exception {
     public UserAlreadyExistException(String email) {
         super("Já existe um usuário cadastrado no email: " + email);
     }
+
+    public UserAlreadyExistException() { super();}
 }

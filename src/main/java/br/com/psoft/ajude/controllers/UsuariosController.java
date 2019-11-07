@@ -22,11 +22,11 @@ public class UsuariosController {
     }
 
     @PostMapping("usuarios")
-    public ResponseEntity<String> adicionaUsuario(@RequestBody String nome, @RequestBody String ultimoNome, @RequestBody String email, @RequestBody Long numeroCartao, @RequestBody Integer senhaCartao) {
+    public ResponseEntity<String> adicionaUsuario(@RequestBody Usuario usuario) {
 
         try {
 
-            usuariosService.adicionaUsuario(nome,ultimoNome,email,numeroCartao,senhaCartao);
+            usuariosService.adicionaUsuario(usuario);
             return new ResponseEntity<String>("Bem vindo! ", HttpStatus.CREATED);
 
         } catch (UserAlreadyExistException uaee) {

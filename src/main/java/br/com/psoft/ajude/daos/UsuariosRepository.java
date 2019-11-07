@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 import java.io.Serializable;
 
 @Repository
-public interface UsuariosDAO<T, ID extends Serializable> extends JpaRepository<Usuario, String> {
+public interface UsuariosRepository<T, ID extends Serializable> extends JpaRepository<Usuario, String> {
 }
