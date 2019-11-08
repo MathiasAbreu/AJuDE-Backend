@@ -10,22 +10,17 @@ import javax.persistence.Id;
 @Entity
 public class Usuario {
 
-    @Getter @Setter
-    private String nome;
-    @Getter @Setter
-    private String ultimoNome;
-
-    @Getter @Setter @Id
+    @Id
     private String email;
 
-    @Getter @Setter
-    private String numeroCartao;
+    private String nome;
+    private String ultimoNome;
 
-    @Getter @Setter
+    private Long numeroCartao;
     private String senha;
 
     @JsonCreator
-    public Usuario(String nome, String ultimoNome, String email, String numeroCartao, String senha) {
+    public Usuario(String email, String nome, String ultimoNome, long numeroCartao, String senha) {
 
         super();
 
@@ -37,7 +32,49 @@ public class Usuario {
 
     }
 
+    @JsonCreator
+    public Usuario() {
+
+        super();
+    }
+
     public String getEmail() {
         return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public String getUltimoNome() {
+        return ultimoNome;
+    }
+
+    public void setUltimoNome(String ultimoNome) {
+        this.ultimoNome = ultimoNome;
+    }
+
+    public long getNumeroCartao() {
+        return numeroCartao;
+    }
+
+    public void setNumeroCartao(long numeroCartao) {
+        this.numeroCartao = numeroCartao;
+    }
+
+    public String getSenha() {
+        return senha;
+    }
+
+    public void setSenha(String senha) {
+        this.senha = senha;
     }
 }

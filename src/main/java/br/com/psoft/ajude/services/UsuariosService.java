@@ -35,6 +35,6 @@ public class UsuariosService {
         if(verificaUsuario.isPresent())
             return verificaUsuario.get();
         else
-            return new Usuario(null,null,null,null,null);
+            return new Usuario(null,null,null,0,null);
     }
 }
