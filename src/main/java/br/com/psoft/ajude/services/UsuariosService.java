@@ -29,12 +29,8 @@ public class UsuariosService {
             throw new UserAlreadyExistException(usuario.getEmail());
     }
 
-    public Usuario getUsuario(String email) {
+    public Optional<Usuario> getUsuario(String email) {
 
-        Optional<Usuario> verificaUsuario = usuariosDao.findById(email);
-        if(verificaUsuario.isPresent())
-            return verificaUsuario.get();
-        else
-            return new Usuario(null,null,null,0,null);
+        return usuariosDao.findById(email);
     }
 }

@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Optional;
+
 @RestController
 public class UsuariosController {
 
@@ -21,7 +23,7 @@ public class UsuariosController {
         this.usuariosService = usuariosService;
     }
 
-    @PostMapping("usuarios")
+    @PostMapping("usuarios/add")
     public ResponseEntity<String> adicionaUsuario(@RequestBody Usuario usuario) {
 
         try {
@@ -36,8 +38,11 @@ public class UsuariosController {
     }
 
     @GetMapping("usuarios")
-    public ResponseEntity<Usuario> buscaUsuario(@RequestBody String email) {
+    public ResponseEntity<Usuario> buscaUsuario(@RequestBody Usuario usuario) {
 
-        return new ResponseEntity<Usuario>(usuariosService.getUsuario(email),HttpStatus.OK);
+        Optional<Usuario> retornoUsuario = usuariosService.getUsuario(usuario.getEmail());
+        if(retornoUsuario.isPresent())
+            return new ResponseEntity<Usuario>(retornoUsuario.get(),HttpStatus.OK);
+        return new ResponseEntity<Usuario>(new Usuario(null,null,null,0,null),HttpStatus.NOT_FOUND);
     }
 }
