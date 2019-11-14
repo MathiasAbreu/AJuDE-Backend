@@ -1,5 +1,6 @@
 package br.com.psoft.ajude.controllers;
 
+import br.com.psoft.ajude.entities.Campanha;
 import br.com.psoft.ajude.entities.Usuario;
 import br.com.psoft.ajude.exceptions.UserAlreadyExistException;
 import br.com.psoft.ajude.services.UsuariosService;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
+import java.util.Set;
 
 @RestController
 public class UsuariosController {
@@ -43,6 +45,20 @@ public class UsuariosController {
         Optional<Usuario> retornoUsuario = usuariosService.getUsuario(usuario.getEmail());
         if(retornoUsuario.isPresent())
             return new ResponseEntity<Usuario>(retornoUsuario.get(),HttpStatus.OK);
-        return new ResponseEntity<Usuario>(new Usuario(null,null,null,0,null),HttpStatus.NOT_FOUND);
+        return new ResponseEntity<Usuario>(new Usuario(null, null, null, 0, null, null),HttpStatus.NOT_FOUND);
+    }
+
+    @PostMapping("campanhas/add")
+    public ResponseEntity<String> adicionaCampanha(@RequestBody Campanha campanha, @RequestBody String emailUser) {
+
+        try {
+
+            usuariosService.adicionaCampanha(campanha,emailUser);
+            return new ResponseEntity<String>("Campanha cadastrada!", HttpStatus.CREATED);
+
+        } catch (Exception exc) {
+
+            return new ResponseEntity<String>(exc.getMessage(), HttpStatus.CONFLICT);
+        }
     }
 }

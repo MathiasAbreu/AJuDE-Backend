@@ -14,7 +14,7 @@ public class AJuDeBackendApplication {
 
 		FilterRegistrationBean<TokenFilter> filterRB = new FilterRegistrationBean<>();
 		filterRB.setFilter(new TokenFilter());
-		filterRB.addUrlPatterns("/ajude/usuarios");
+		filterRB.addUrlPatterns("/ajude/usuarios","/ajude/campanhas/add");
 
 		return filterRB;
 	}

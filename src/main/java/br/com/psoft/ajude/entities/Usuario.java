@@ -5,7 +5,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import java.util.Set;
 
 @Entity
 public class Usuario {
@@ -19,8 +22,11 @@ public class Usuario {
     private Long numeroCartao;
     private String senha;
 
+    @OneToMany(mappedBy = "usuario", fetch = FetchType.EAGER)
+    private Set<Campanha> campanhas;
+
     @JsonCreator
-    public Usuario(String email, String nome, String ultimoNome, long numeroCartao, String senha) {
+    public Usuario(String email, String nome, String ultimoNome, long numeroCartao, String senha, Set<Campanha> campanhas) {
 
         super();
 
@@ -29,6 +35,7 @@ public class Usuario {
         this.email = email;
         this.numeroCartao = numeroCartao;
         this.senha = senha;
+        this.campanhas = campanhas;
 
     }
 
@@ -36,6 +43,10 @@ public class Usuario {
     public Usuario() {
 
         super();
+    }
+
+    public void adicionaCampanha(Campanha campanha) {
+        campanhas.add(campanha);
     }
 
     public String getEmail() {
