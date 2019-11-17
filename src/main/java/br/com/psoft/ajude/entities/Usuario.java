@@ -22,11 +22,8 @@ public class Usuario {
     private Long numeroCartao;
     private String senha;
 
-    @OneToMany(mappedBy = "usuario", fetch = FetchType.EAGER)
-    private Set<Campanha> campanhas;
-
     @JsonCreator
-    public Usuario(String email, String nome, String ultimoNome, long numeroCartao, String senha, Set<Campanha> campanhas) {
+    public Usuario(String email, String nome, String ultimoNome, long numeroCartao, String senha) {
 
         super();
 
@@ -35,7 +32,6 @@ public class Usuario {
         this.email = email;
         this.numeroCartao = numeroCartao;
         this.senha = senha;
-        this.campanhas = campanhas;
 
     }
 
@@ -43,10 +39,6 @@ public class Usuario {
     public Usuario() {
 
         super();
-    }
-
-    public void adicionaCampanha(Campanha campanha) {
-        campanhas.add(campanha);
     }
 
     public String getEmail() {
@@ -87,5 +79,10 @@ public class Usuario {
 
     public void setSenha(String senha) {
         this.senha = senha;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Usuario:\n Nome: %s\n Sobrenome: %s\n Email: %s\n Numero do Cartão: %d",nome,ultimoNome,email,numeroCartao);
     }
 }

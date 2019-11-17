@@ -3,6 +3,7 @@ package br.com.psoft.ajude.entities;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.text.SimpleDateFormat;
 import javax.persistence.*;
 import java.util.Date;
 
@@ -16,7 +17,7 @@ public class Campanha {
     private String descricao;
     private String identificadorURL;
 
-    private Date dataDeadline;
+    private String dataDeadline;
 
     private String status;
 
@@ -32,7 +33,7 @@ public class Campanha {
     private Usuario usuario;
 
     @JsonCreator
-    public Campanha(long id, String nome, String descricao, String identificadorURL, Date dataDeadline, double meta, Usuario usuario) {
+    public Campanha(long id, String nome, String descricao, String identificadorURL, String dataDeadline, double meta, Usuario usuario) {
 
         this.id = id;
         this.nome = nome;
@@ -47,7 +48,25 @@ public class Campanha {
 
     }
 
+    @JsonCreator
+    public Campanha() {
+
+    }
+
+    public String getIdentificadorURL() {
+        return identificadorURL;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Campanha:\n ID: %d\n Nome: %s\n Descrição: %s\n Identificador URL: %s\n Data final: %s\n Meta: %.2f\n",id,nome,descricao,identificadorURL,dataDeadline,meta) + "[" + usuario.toString() + "]";
     }
 }

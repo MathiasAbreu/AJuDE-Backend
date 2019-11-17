@@ -41,7 +41,7 @@ public class LoginController {
         if(!authUsuario.get().getSenha().equals(usuario.getSenha()))
             throw new UserPasswordIncorrectException();
 
-        String token = Jwts.builder().setSubject(authUsuario.get().getEmail()).signWith(SignatureAlgorithm.HS512,TOKEN_KEY).setExpiration(new Date(System.currentTimeMillis() + (3600 * 10000))).compact();
+        String token = Jwts.builder().setSubject(authUsuario.get().getEmail()).signWith(SignatureAlgorithm.HS512,TOKEN_KEY).setExpiration(new Date(System.currentTimeMillis() + 3600 * 10000)).compact();
         return new LoginResponse(token);
     }
 

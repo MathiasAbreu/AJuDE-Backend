@@ -6,8 +6,10 @@ import br.com.psoft.ajude.entities.Campanha;
 import br.com.psoft.ajude.entities.Usuario;
 import br.com.psoft.ajude.exceptions.UserAlreadyExistException;
 import br.com.psoft.ajude.exceptions.UserNotFoundException;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -39,16 +41,28 @@ public class UsuariosService {
         return usuariosDao.findById(email);
     }
 
-    public void adicionaCampanha(Campanha campanha, String emailUser) throws UserNotFoundException {
+    public String getCampanha(Campanha camp) {
+
+        List<Campanha> campanhas = campanhasDao.findAll();
+
+        for(Campanha campanha: campanhas) {
+
+            if(campanha.getIdentificadorURL().equals(camp.getIdentificadorURL()))
+                return campanha.toString();
+        }
+
+        return "null";
+    }
+
+    public void adicionaCampanha(Campanha campanha,String emailUser) throws UserNotFoundException {
 
         Optional<Usuario> user = usuariosDao.findById(emailUser);
         if(user.isPresent()) {
 
             campanha.setUsuario(user.get());
-            user.get().adicionaCampanha(campanha);
             campanhasDao.save(campanha);
         }
-
-        throw new UserNotFoundException("Usuário não encontrado!");
+        else
+            throw new UserNotFoundException(emailUser);
     }
 }
