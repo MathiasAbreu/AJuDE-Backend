@@ -9,8 +9,7 @@ import br.com.psoft.ajude.exceptions.UserNotFoundException;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class UsuariosService {
@@ -64,5 +63,12 @@ public class UsuariosService {
         }
         else
             throw new UserNotFoundException(emailUser);
+    }
+
+    public List<Campanha> buscarCampanhaPorSubstring(String substring, String statusCampanha) {
+
+        List<Campanha> campanhas = campanhasDao.findAll();
+        
+        return campanhas;
     }
 }
