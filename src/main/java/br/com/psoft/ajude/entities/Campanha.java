@@ -3,9 +3,7 @@ package br.com.psoft.ajude.entities;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import java.text.SimpleDateFormat;
 import javax.persistence.*;
-import java.util.Date;
 
 @Entity
 public class Campanha {
@@ -33,7 +31,7 @@ public class Campanha {
     private Usuario usuario;
 
     @JsonCreator
-    public Campanha(long id, String nome, String descricao, String identificadorURL, String dataDeadline, double meta, Usuario usuario) {
+    public Campanha(long id, String nome, String descricao, String identificadorURL, String dataDeadline, double meta) {
 
         this.id = id;
         this.nome = nome;
@@ -41,9 +39,8 @@ public class Campanha {
         this.identificadorURL = identificadorURL;
         this.dataDeadline = dataDeadline;
         this.meta = meta;
-        this.usuario = usuario;
 
-        this.status = "Ativa.";
+        this.status = "Ativa";
         this.doacoes = 0;
 
     }
@@ -53,8 +50,80 @@ public class Campanha {
 
     }
 
+    public long getId() {
+        return id;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
+    }
+
     public String getIdentificadorURL() {
         return identificadorURL;
+    }
+
+    public void setIdentificadorURL(String identificadorURL) {
+        this.identificadorURL = identificadorURL;
+    }
+
+    public String getDataDeadline() {
+        return dataDeadline;
+    }
+
+    public void setDataDeadline(String dataDeadline) {
+        this.dataDeadline = dataDeadline;
+    }
+
+    public double getMeta() {
+        return meta;
+    }
+
+    public void setMeta(double meta) {
+        this.meta = meta;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public double getDoacoes() {
+        return doacoes;
+    }
+
+    public void setDoacoes(double doacoes) {
+        this.doacoes = doacoes;
+    }
+
+    public String getComentarios() {
+        return comentarios;
+    }
+
+    public void setComentarios(String comentarios) {
+        this.comentarios = comentarios;
+    }
+
+    public int getLikes() {
+        return likes;
+    }
+
+    public void setLikes(int likes) {
+        this.likes = likes;
     }
 
     public Usuario getUsuario() {

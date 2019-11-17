@@ -65,10 +65,31 @@ public class UsuariosService {
             throw new UserNotFoundException(emailUser);
     }
 
-    public List<Campanha> buscarCampanhaPorSubstring(String substring, String statusCampanha) {
+    public List<Campanha> buscarCampanhaPorSubstring(String substring) {
 
         List<Campanha> campanhas = campanhasDao.findAll();
-        
-        return campanhas;
+        List<Campanha> retorno = new ArrayList<Campanha>();
+
+        for(int i = 0; i < campanhas.size(); i++) {
+
+            if((campanhas.get(i).getIdentificadorURL().contains(substring.toLowerCase())))
+                retorno.add(campanhas.get(i));
+        }
+
+        return retorno;
+    }
+
+    public List<Campanha> buscarCampanhaPorSubstring(String substring, List<String> parametros) {
+
+        List<Campanha> campanhas = buscarCampanhaPorSubstring(substring);
+        List<Campanha> retorno = new ArrayList<Campanha>();
+
+        for(int i = 0; i < campanhas.size(); i++) {
+
+            if(campanhas.get(i).getStatus().equals("Ativa.") || parametros.contains(campanhas.get(i).getStatus()))
+                retorno.add(campanhas.get(i));
+        }
+
+        return retorno;
     }
 }

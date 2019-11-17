@@ -3,12 +3,16 @@ package br.com.psoft.ajude.controllers;
 import br.com.psoft.ajude.entities.Campanha;
 import br.com.psoft.ajude.entities.Usuario;
 import br.com.psoft.ajude.exceptions.UserAlreadyExistException;
+import br.com.psoft.ajude.exceptions.UserException;
+import br.com.psoft.ajude.exceptions.UserNotFoundException;
 import br.com.psoft.ajude.services.JWTService;
 import br.com.psoft.ajude.services.UsuariosService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -69,6 +73,27 @@ public class UsuariosController {
         } catch (Exception exc) {
 
             return new ResponseEntity<String>(exc.getMessage(), HttpStatus.CONFLICT);
+        }
+    }
+
+    @GetMapping("campanhas/busca")
+    public ResponseEntity<List<Campanha>> buscaCampanhaPorSubstring(@RequestHeader("Authorization") String header, @RequestBody List<String> parametrosBusca) {
+
+        try {
+
+            if(jwtService.usuarioExiste(header)) {
+
+                if(parametrosBusca.size() == 1)
+                    return new ResponseEntity<List<Campanha>>(usuariosService.buscarCampanhaPorSubstring(parametrosBusca.get(0)),HttpStatus.OK);
+                else
+                    return new ResponseEntity<List<Campanha>>(usuariosService.buscarCampanhaPorSubstring(parametrosBusca.get(0),parametrosBusca),HttpStatus.OK);
+
+            }
+
+            throw new UserNotFoundException();
+        } catch (UserException userExc) {
+
+                return new ResponseEntity<List<Campanha>>(new ArrayList<>(),HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 }
