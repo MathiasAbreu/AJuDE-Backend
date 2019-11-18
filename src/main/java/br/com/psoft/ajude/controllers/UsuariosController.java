@@ -51,49 +51,4 @@ public class UsuariosController {
             return new ResponseEntity<Usuario>(retornoUsuario.get(),HttpStatus.OK);
         return new ResponseEntity<Usuario>(new Usuario(null, null, null, 0, null),HttpStatus.NOT_FOUND);
     }
-
-    @GetMapping("campanhas/get")
-    public ResponseEntity<String> getCampanha(@RequestBody Campanha campanha) {
-
-        return new ResponseEntity<String>(usuariosService.getCampanha(campanha),HttpStatus.OK);
-    }
-
-    @PostMapping("campanhas/add")
-    public ResponseEntity<String> adicionaCampanha(@RequestHeader("Authorization") String header, @RequestBody Campanha campanha) {
-
-        try {
-
-            if(jwtService.usuarioExiste(header)) {
-
-                usuariosService.adicionaCampanha(campanha,jwtService.getUsuarioDoToken(header));
-                return new ResponseEntity<String>("Campanha cadastrada!", HttpStatus.CREATED);
-            }
-
-            return new ResponseEntity<>(HttpStatus.NON_AUTHORITATIVE_INFORMATION);
-        } catch (Exception exc) {
-
-            return new ResponseEntity<String>(exc.getMessage(), HttpStatus.CONFLICT);
-        }
-    }
-
-    @GetMapping("campanhas/busca")
-    public ResponseEntity<List<Campanha>> buscaCampanhaPorSubstring(@RequestHeader("Authorization") String header, @RequestBody List<String> parametrosBusca) {
-
-        try {
-
-            if(jwtService.usuarioExiste(header)) {
-
-                if(parametrosBusca.size() == 1)
-                    return new ResponseEntity<List<Campanha>>(usuariosService.buscarCampanhaPorSubstring(parametrosBusca.get(0)),HttpStatus.OK);
-                else
-                    return new ResponseEntity<List<Campanha>>(usuariosService.buscarCampanhaPorSubstring(parametrosBusca.get(0),parametrosBusca),HttpStatus.OK);
-
-            }
-
-            throw new UserNotFoundException();
-        } catch (UserException userExc) {
-
-                return new ResponseEntity<List<Campanha>>(new ArrayList<>(),HttpStatus.SERVICE_UNAVAILABLE);
-        }
-    }
 }
