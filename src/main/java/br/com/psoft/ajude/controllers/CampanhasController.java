@@ -1,6 +1,7 @@
 package br.com.psoft.ajude.controllers;
 
 import br.com.psoft.ajude.entities.Campanha;
+import br.com.psoft.ajude.exceptions.CampaignNotFoundException;
 import br.com.psoft.ajude.exceptions.UserException;
 import br.com.psoft.ajude.exceptions.UserNotFoundException;
 import br.com.psoft.ajude.services.CampanhasService;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
+@RequestMapping("campanhas")
 public class CampanhasController {
 
     private CampanhasService campanhasService;
@@ -25,13 +27,24 @@ public class CampanhasController {
         this.campanhasService = campanhasService;
     }
 
-    @GetMapping("campanhas/busca")
-    public ResponseEntity<String> getCampanha(@RequestBody Campanha campanha) {
+    @GetMapping("/busca")
+    public ResponseEntity<Campanha> getCampanha(@RequestHeader("Authorization") String header, @RequestBody Campanha campanha) {
 
-        return new ResponseEntity<String>(campanhasService.getCampanha(campanha), HttpStatus.OK);
+        try {
+
+            if(jwtService.usuarioExiste(header)) {
+
+                return new ResponseEntity<Campanha>(campanhasService.getCampanha(campanha), HttpStatus.OK);
+            }
+            return new ResponseEntity<Campanha>(new Campanha(), HttpStatus.NON_AUTHORITATIVE_INFORMATION);
+
+        } catch (UserException | CampaignNotFoundException userErr) {
+
+            return new ResponseEntity<Campanha>(new Campanha(), HttpStatus.NOT_FOUND);
+        }
     }
 
-    @PostMapping("campanhas/adicionar")
+    @PostMapping("/adiciona")
     public ResponseEntity<String> adicionaCampanha(@RequestHeader("Authorization") String header, @RequestBody Campanha campanha) {
 
         try {
@@ -49,7 +62,7 @@ public class CampanhasController {
         }
     }
 
-    @GetMapping("campanhas/buscaPorSubstring")
+    @GetMapping("/buscaSubstring")
     public ResponseEntity<List<Campanha>> buscaCampanhaPorSubstring(@RequestHeader("Authorization") String header, @RequestBody List<String> parametrosBusca) {
 
         try {

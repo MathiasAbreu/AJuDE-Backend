@@ -4,6 +4,7 @@ import br.com.psoft.ajude.daos.CampanhasRepository;
 import br.com.psoft.ajude.daos.UsuariosRepository;
 import br.com.psoft.ajude.entities.Campanha;
 import br.com.psoft.ajude.entities.Usuario;
+import br.com.psoft.ajude.exceptions.CampaignNotFoundException;
 import br.com.psoft.ajude.exceptions.UserNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -24,17 +25,17 @@ public class CampanhasService {
         this.campanhasDao = campanhasDao;
     }
 
-    public String getCampanha(Campanha camp) {
+    public Campanha getCampanha(Campanha camp) throws CampaignNotFoundException {
 
         List<Campanha> campanhas = campanhasDao.findAll();
 
         for(Campanha campanha: campanhas) {
 
             if(campanha.getIdentificadorURL().equals(camp.getIdentificadorURL()))
-                return campanha.toString();
+                return campanha;
         }
 
-        return "null";
+        throw new CampaignNotFoundException(camp.getIdentificadorURL());
     }
 
     public void adicionaCampanha(Campanha campanha,String emailUser) throws UserNotFoundException {
