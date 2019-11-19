@@ -1,9 +1,7 @@
 package br.com.psoft.ajude.controllers;
 
 import br.com.psoft.ajude.entities.Campanha;
-import br.com.psoft.ajude.exceptions.CampaignNotFoundException;
-import br.com.psoft.ajude.exceptions.UserException;
-import br.com.psoft.ajude.exceptions.UserNotFoundException;
+import br.com.psoft.ajude.exceptions.*;
 import br.com.psoft.ajude.services.CampanhasService;
 import br.com.psoft.ajude.services.JWTService;
 import org.springframework.http.HttpStatus;
@@ -80,6 +78,26 @@ public class CampanhasController {
         } catch (UserException userExc) {
 
             return new ResponseEntity<List<Campanha>>(new ArrayList<>(),HttpStatus.SERVICE_UNAVAILABLE);
+        }
+    }
+
+    @PostMapping("/addComentario")
+    public ResponseEntity<String> adicionarComentario(@RequestHeader("Authorization") String header, @RequestBody List<String> parametros) {
+
+        try {
+
+            if(jwtService.usuarioExiste(header)) {
+
+                return new ResponseEntity<String>(campanhasService.adicionaComentario(jwtService.getUsuarioDoToken(header),parametros),HttpStatus.CREATED);
+            }
+            throw new UserNotFoundException();
+
+        } catch (UserException err) {
+
+            return new ResponseEntity<String>(err.getMessage(), HttpStatus.NON_AUTHORITATIVE_INFORMATION);
+        } catch (CampaignException | CommentException err) {
+
+            return new ResponseEntity<String>(err.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 }

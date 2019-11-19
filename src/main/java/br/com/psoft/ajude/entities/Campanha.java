@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Campanha {
@@ -22,7 +24,8 @@ public class Campanha {
     private double meta;
     private double doacoes;
 
-    private String comentarios;
+    @OneToMany(mappedBy = "idComentario", fetch = FetchType.EAGER)
+    private List<Comentario> comentarios;
     private int likes;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -43,6 +46,7 @@ public class Campanha {
         this.status = "Ativa";
         this.doacoes = 0;
 
+        this.comentarios = new ArrayList<>();
     }
 
     @JsonCreator
@@ -110,12 +114,27 @@ public class Campanha {
         this.doacoes = doacoes;
     }
 
-    public String getComentarios() {
+    public List<Comentario> getComentarios() {
         return comentarios;
     }
 
-    public void setComentarios(String comentarios) {
-        this.comentarios = comentarios;
+    public void adicionaComentario(Comentario comentario) {
+        this.comentarios.add(comentario);
+    }
+
+    public void removeComentario(Comentario comentario) {
+
+        for(int i = 0; i < comentarios.size(); i++) {
+            if(comentario.getIdComentario() == comentarios.get(i).getIdComentario()) {
+                comentarios.remove(i);
+                return;
+            }
+        }
+    }
+
+    public void adicionaResposta(long id, Comentario resposta) {
+
+
     }
 
     public int getLikes() {
