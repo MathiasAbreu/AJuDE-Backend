@@ -12,6 +12,9 @@ public class Comentario {
     private long idComentario;
 
     private String conteudo;
+
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "idResposta")
     private Comentario resposta;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
