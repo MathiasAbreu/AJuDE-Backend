@@ -13,25 +13,32 @@ public class Comentario {
 
     private String conteudo;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "idResposta")
-    private Comentario resposta;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "id")
+    @JsonIgnore
+    private Campanha campanha;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "email")
     @JsonIgnore
     private Usuario usuario;
 
+    private boolean status;
+
     @JsonCreator
     public Comentario(long idComentario, String conteudo) {
 
         super();
+
+        this.idComentario = idComentario;
         this.conteudo = conteudo;
+        this.status = true;
     }
 
     @JsonCreator
     public Comentario() {
         super();
+        this.status = true;
     }
 
     public long getIdComentario() {
@@ -50,12 +57,12 @@ public class Comentario {
         this.conteudo = conteudo;
     }
 
-    public Comentario getResposta() {
-        return resposta;
+    public Campanha getCampanha() {
+        return campanha;
     }
 
-    public void setResposta(Comentario resposta) {
-        this.resposta = resposta;
+    public void setCampanha(Campanha campanha) {
+        this.campanha = campanha;
     }
 
     public Usuario getUsuario() {
@@ -64,5 +71,17 @@ public class Comentario {
 
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
+    }
+
+    public boolean getStatus() {
+        return this.status;
+    }
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Id: %d, Conteudo: %s, URL: %s, Usuario: %s",idComentario,conteudo,campanha.getIdentificadorURL(),usuario.getEmail());
     }
 }

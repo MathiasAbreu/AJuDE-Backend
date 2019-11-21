@@ -24,12 +24,13 @@ public class Campanha {
     private double meta;
     private double doacoes;
 
-    @OneToMany(mappedBy = "idComentario", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "campanha", fetch = FetchType.EAGER)
     private List<Comentario> comentarios;
+
     private int likes;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "emailUsuario")
+    @JoinColumn(name = "email")
     @JsonIgnore
     private Usuario usuario;
 
@@ -122,11 +123,11 @@ public class Campanha {
         this.comentarios.add(comentario);
     }
 
-    public void removeComentario(Comentario comentario) {
+    public void deletaComentario(Comentario comentario) {
 
         for(int i = 0; i < comentarios.size(); i++) {
             if(comentario.getIdComentario() == comentarios.get(i).getIdComentario()) {
-                comentarios.remove(i);
+                comentarios.get(i).setStatus(false);
                 return;
             }
         }
@@ -151,6 +152,10 @@ public class Campanha {
 
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
+    }
+
+    public int quantidadeComentarios() {
+        return comentarios.size() + 1;
     }
 
     @Override
