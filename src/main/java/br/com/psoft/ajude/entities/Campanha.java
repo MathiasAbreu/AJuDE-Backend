@@ -52,7 +52,13 @@ public class Campanha {
 
     @JsonCreator
     public Campanha() {
+        super();
+    }
 
+    public Campanha(String identificadorURL) {
+
+        super();
+        this.identificadorURL = identificadorURL;
     }
 
     public long getId() {
@@ -128,14 +134,20 @@ public class Campanha {
         for(int i = 0; i < comentarios.size(); i++) {
             if(comentario.getIdComentario() == comentarios.get(i).getIdComentario()) {
                 comentarios.get(i).setStatus(false);
+                deletaResposta(comentario.getIdComentario());
                 return;
             }
         }
     }
 
-    public void adicionaResposta(long id, Comentario resposta) {
+    private void deletaResposta(Long idComentario) {
 
-
+        for(int i = 0; i < comentarios.size(); i++) {
+            if(comentarios.get(i).getIdResposta() == idComentario) {
+                comentarios.get(i).setStatus(false);
+                return;
+            }
+        }
     }
 
     public int getLikes() {
@@ -152,10 +164,6 @@ public class Campanha {
 
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
-    }
-
-    public int quantidadeComentarios() {
-        return comentarios.size() + 1;
     }
 
     @Override

@@ -84,41 +84,50 @@ public class CampanhasService {
         return retorno;
     }
 
-    //[comentario,resposta -/- conteudo -/- urlCampanha]
-    public Campanha adicionaComentario(String emailUser, List<String> parametros) throws CampaignException,CommentParametersInsufficientException {
+    private Campanha addComentario(Campanha campanha, Comentario comentario) {
 
-        Comentario comentario = new Comentario();
-        comentario.setConteudo(parametros.get(1));
+        return (campanhasDao.findById(campanha.getId()).map(record -> {
+
+            record.adicionaComentario(comentario);
+            comentariosRepository.save(comentario);
+            return campanhasDao.save(record);
+        })).get();
+    }
+
+    private Campanha addResposta(Campanha campanha, Comentario comentario, Long idComentario) {
+
+        return (campanhasDao.findById(campanha.getId()).map(record -> {
+
+            comentario.setIdResposta(idComentario);
+            record.adicionaComentario(comentario);
+            comentariosRepository.save(comentario);
+            return campanhasDao.save(record);
+        })).get();
+    }
+
+    //[comentario,resposta -/- conteudo -/- urlCampanha] + [idComentario]
+    public Campanha adicionaComentario(String emailUser, List<String> parametros) throws CampaignException,CommentParametersInsufficientException {
 
         Optional<Usuario> user = usuariosDao.findById(emailUser);
 
         if(!user.isPresent())
             throw new CommentParametersInsufficientException();
 
-        comentario.setUsuario(user.get());
-
-        Campanha campanha = new Campanha();
-        campanha.setIdentificadorURL(parametros.get(2));
-
+        Campanha campanha = new Campanha(parametros.get(2));
         campanha = getCampanha(campanha);
 
-        System.out.println(campanha.toString());
-        comentario.setCampanha(campanha);
+        Comentario comentario = new Comentario(parametros.get(1),campanha,user.get());
 
-        campanha = (campanhasDao.findById(campanha.getId()).map(record -> {
+        if(parametros.get(0).equals("comentario"))
+            return addComentario(campanha,comentario);
 
-            System.out.println(comentario.toString());
+        if(parametros.get(0).equals("resposta"))
+            return addResposta(campanha,comentario,Long.parseLong(parametros.get(3)));
 
-            record.adicionaComentario(comentario);
-            comentariosRepository.save(comentario);
-            return campanhasDao.save(record);
-
-        })).get();
-
-        return campanha;
+        throw new CommentParametersInsufficientException();
     }
     //[identificadorURL,idComentario]
-    public void deletarComentario(String emailUser, List<String> parametros) throws CampaignNotFoundException {
+    public Campanha deletarComentario(String emailUser, List<String> parametros) throws CampaignNotFoundException {
 
         Campanha campanha = new Campanha();
         campanha.setIdentificadorURL(parametros.get(0));
@@ -136,9 +145,27 @@ public class CampanhasService {
                     return campanhasDao.save(record);
 
                 })).get();
-                return;
+                return revisaoCampanha(campanha);
             }
         }
+
+        return campanha;
+    }
+
+    private Campanha revisaoCampanha(Campanha campanha) {
+
+        List<Comentario> comentarios = campanha.getComentarios();
+        for(int i = 0; i < comentarios.size(); i++) {
+
+            if(!comentarios.get(i).getStatus()) {
+
+                comentarios.remove(i);
+                return revisaoCampanha(campanha);
+            }
+
+        }
+
+        return campanha;
     }
 
     /*private Campanha addResposta(String emailUser, List<String> parametros) throws CommentParametersInsufficientException, CampaignNotFoundException {

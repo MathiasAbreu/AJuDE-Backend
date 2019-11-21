@@ -10,6 +10,7 @@ public class Comentario {
 
     @Id @GeneratedValue
     private long idComentario;
+    private long idResposta;  //Indica se esse comentário é uma resposta de outro comentario.
 
     private String conteudo;
 
@@ -41,12 +42,28 @@ public class Comentario {
         this.status = true;
     }
 
+    public Comentario(String conteudo, Campanha campanha, Usuario usuario) {
+
+        this.conteudo = conteudo;
+        this.campanha = campanha;
+        this.usuario = usuario;
+        this.status = true;
+    }
+
     public long getIdComentario() {
         return idComentario;
     }
 
     public void setIdComentario(long idComentario) {
         this.idComentario = idComentario;
+    }
+
+    public long getIdResposta() {
+        return idResposta;
+    }
+
+    public void setIdResposta(long resposta) {
+        this.idResposta = resposta;
     }
 
     public String getConteudo() {

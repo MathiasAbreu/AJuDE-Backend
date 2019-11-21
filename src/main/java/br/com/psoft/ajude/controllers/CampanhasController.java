@@ -103,20 +103,19 @@ public class CampanhasController {
     }
 
     @DeleteMapping("/delComentario")
-    public ResponseEntity deletarComentario(@RequestHeader("Authorization") String header, @RequestBody List<String> parametros) {
+    public ResponseEntity<Campanha> deletarComentario(@RequestHeader("Authorization") String header, @RequestBody List<String> parametros) {
 
         try {
 
             if(jwtService.usuarioExiste(header)) {
 
-                campanhasService.deletarComentario(jwtService.getUsuarioDoToken(header),parametros);
-                return new ResponseEntity(HttpStatus.OK);
+                return new ResponseEntity<Campanha>(campanhasService.deletarComentario(jwtService.getUsuarioDoToken(header),parametros),HttpStatus.OK);
             }
 
             throw new UserNotFoundException();
         } catch (UserException | CampaignException err) {
 
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<Campanha>(new Campanha(),HttpStatus.NOT_FOUND);
         }
     }
 }
