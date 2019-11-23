@@ -22,7 +22,7 @@ public class Comentario {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "email")
     @JsonIgnore
-    private Usuario usuario;
+    private Usuario usuarioQComentou;
 
     private boolean status;
 
@@ -42,11 +42,12 @@ public class Comentario {
         this.status = true;
     }
 
-    public Comentario(String conteudo, Campanha campanha, Usuario usuario) {
+    @JsonCreator
+    public Comentario(String conteudo, Campanha campanha, Usuario usuarioQComentou) {
 
         this.conteudo = conteudo;
         this.campanha = campanha;
-        this.usuario = usuario;
+        this.usuarioQComentou = usuarioQComentou;
         this.status = true;
     }
 
@@ -82,12 +83,12 @@ public class Comentario {
         this.campanha = campanha;
     }
 
-    public Usuario getUsuario() {
-        return usuario;
+    public Usuario getUsuarioQComentou() {
+        return usuarioQComentou;
     }
 
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
+    public void setUsuarioQComentou(Usuario usuarioQComentou) {
+        this.usuarioQComentou = usuarioQComentou;
     }
 
     public boolean getStatus() {
@@ -99,6 +100,6 @@ public class Comentario {
 
     @Override
     public String toString() {
-        return String.format("Id: %d, Conteudo: %s, URL: %s, Usuario: %s",idComentario,conteudo,campanha.getIdentificadorURL(),usuario.getEmail());
+        return String.format("Id: %d, Conteudo: %s, URL: %s, Usuario: %s",idComentario,conteudo,campanha.getIdentificadorURL(), usuarioQComentou.getEmail());
     }
 }

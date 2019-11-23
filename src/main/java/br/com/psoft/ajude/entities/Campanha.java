@@ -1,11 +1,9 @@
 package br.com.psoft.ajude.entities;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Entity
 public class Campanha {
@@ -22,16 +20,19 @@ public class Campanha {
     private String status;
 
     private double meta;
-    private double doacoes;
+    private double valorDoado;
 
-    @OneToMany(mappedBy = "campanha", fetch = FetchType.EAGER)
-    private List<Comentario> comentarios;
+    @OneToMany(mappedBy = "campanha", fetch = FetchType.LAZY)
+    private List<Comentario> comentarios = new ArrayList<>();
 
-    private int likes;
+    @OneToMany(mappedBy = "campanhaAlvo", fetch = FetchType.LAZY)
+    private List<Doacao> doacoes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "campanhaCurtida", fetch = FetchType.LAZY)
+    private List<Curtida> curtidas = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "email")
-    @JsonIgnore
     private Usuario usuario;
 
     @JsonCreator
@@ -45,9 +46,7 @@ public class Campanha {
         this.meta = meta;
 
         this.status = "Ativa";
-        this.doacoes = 0;
-
-        this.comentarios = new ArrayList<>();
+        this.valorDoado = 0;
     }
 
     @JsonCreator
@@ -113,12 +112,12 @@ public class Campanha {
         this.status = status;
     }
 
-    public double getDoacoes() {
-        return doacoes;
+    public double getValorDoado() {
+        return valorDoado;
     }
 
-    public void setDoacoes(double doacoes) {
-        this.doacoes = doacoes;
+    public void setValorDoado(double valorDoado) {
+        this.valorDoado = valorDoado;
     }
 
     public List<Comentario> getComentarios() {
@@ -150,13 +149,18 @@ public class Campanha {
         }
     }
 
-    public int getLikes() {
-        return likes;
+    /*public List<Like> getLikes() {
+
+        List<Like> retornoLikes = new ArrayList<>();
+        for(Like like : likes)
+            retornoLikes.add(like);
+
+        return retornoLikes;
     }
 
-    public void setLikes(int likes) {
-        this.likes = likes;
-    }
+    public void adicionaLike(Like like) {
+        this.likes.add(like);
+    }*/
 
     public Usuario getUsuario() {
         return usuario;

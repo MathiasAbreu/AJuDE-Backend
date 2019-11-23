@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -21,6 +22,17 @@ public class Usuario {
 
     private Long numeroCartao;
     private String senha;
+
+    @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
+    private List<Campanha> campanhas;
+
+    @OneToMany(mappedBy = "usuarioDoador", fetch = FetchType.LAZY)
+    private List<Doacao> doacoes;
+
+    @OneToMany(mappedBy = "usuarioQCurtiu", fetch = FetchType.LAZY)
+    private List<Curtida> curtidas;
+
+
 
     @JsonCreator
     public Usuario(String email, String nome, String ultimoNome, long numeroCartao, String senha) {

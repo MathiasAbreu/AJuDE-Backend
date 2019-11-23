@@ -118,4 +118,24 @@ public class CampanhasController {
             return new ResponseEntity<Campanha>(new Campanha(),HttpStatus.NOT_FOUND);
         }
     }
+
+    /*@PostMapping("/addLike")
+    public ResponseEntity<Campanha> adicionarLike(@RequestHeader("Authorization") String header, @RequestBody String identificadorURL) {
+
+        try {
+
+            if(jwtService.usuarioExiste(header)) {
+
+                return new ResponseEntity<Campanha>(campanhasService.adicionaLike(jwtService.getUsuarioDoToken(header),identificadorURL),HttpStatus.OK);
+            }
+
+            throw new UserNotFoundException();
+        } catch(UserException err) {
+
+            return new ResponseEntity<Campanha>(new Campanha(),HttpStatus.UNAUTHORIZED);
+        } catch (CampaignException err) {
+
+            return new ResponseEntity<Campanha>(new Campanha(), HttpStatus.NOT_FOUND);
+        }
+    }*/
 }
