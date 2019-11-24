@@ -22,6 +22,10 @@ public class Campanha {
     private double meta;
     private double valorDoado;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "email")
+    private Usuario usuario;
+
     @OneToMany(mappedBy = "campanha", fetch = FetchType.LAZY)
     private List<Comentario> comentarios = new ArrayList<>();
 
@@ -30,10 +34,6 @@ public class Campanha {
 
     @OneToMany(mappedBy = "campanhaCurtida", fetch = FetchType.LAZY)
     private List<Curtida> curtidas = new ArrayList<>();
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "email")
-    private Usuario usuario;
 
     @JsonCreator
     public Campanha(long id, String nome, String descricao, String identificadorURL, String dataDeadline, double meta) {
@@ -120,8 +120,24 @@ public class Campanha {
         this.valorDoado = valorDoado;
     }
 
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
     public List<Comentario> getComentarios() {
         return comentarios;
+    }
+
+    public List<Curtida> getCurtidas() {
+        return curtidas;
+    }
+
+    public List<Doacao> getDoacoes() {
+        return doacoes;
     }
 
     public void adicionaComentario(Comentario comentario) {
@@ -161,15 +177,6 @@ public class Campanha {
     public void adicionaLike(Like like) {
         this.likes.add(like);
     }*/
-
-    public Usuario getUsuario() {
-        return usuario;
-    }
-
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-    }
-
     @Override
     public String toString() {
         return String.format("Campanha:\n ID: %d\n Nome: %s\n Descrição: %s\n Identificador URL: %s\n Data final: %s\n Meta: %.2f\n",id,nome,descricao,identificadorURL,dataDeadline,meta) + "[" + usuario.toString() + "]";

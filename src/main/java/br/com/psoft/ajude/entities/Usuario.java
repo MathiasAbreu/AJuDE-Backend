@@ -1,6 +1,7 @@
 package br.com.psoft.ajude.entities;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -21,18 +23,15 @@ public class Usuario {
     private String ultimoNome;
 
     private Long numeroCartao;
+
     private String senha;
 
     @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
-    private List<Campanha> campanhas;
+    @JsonIgnore
+    private List<Campanha> campanhas = new ArrayList<>();
 
     @OneToMany(mappedBy = "usuarioDoador", fetch = FetchType.LAZY)
-    private List<Doacao> doacoes;
-
-    @OneToMany(mappedBy = "usuarioQCurtiu", fetch = FetchType.LAZY)
-    private List<Curtida> curtidas;
-
-
+    private List<Doacao> doacoes = new ArrayList<>();
 
     @JsonCreator
     public Usuario(String email, String nome, String ultimoNome, long numeroCartao, String senha) {
@@ -93,8 +92,23 @@ public class Usuario {
         this.senha = senha;
     }
 
-    @Override
-    public String toString() {
-        return String.format("Usuario:\n Nome: %s\n Sobrenome: %s\n Email: %s\n Numero do Cartão: %d",nome,ultimoNome,email,numeroCartao);
+    public List<Campanha> getCampanhas() {
+        return campanhas;
+    }
+
+    public void setCampanhas(List<Campanha> campanhas) {
+        this.campanhas = campanhas;
+    }
+
+    public List<Doacao> getDoacoes() {
+        return doacoes;
+    }
+
+    public void setDoacoes(List<Doacao> doacoes) {
+        this.doacoes = doacoes;
+    }
+
+    public void adicionaCampanha(Campanha campanha) {
+        campanhas.add(campanha);
     }
 }

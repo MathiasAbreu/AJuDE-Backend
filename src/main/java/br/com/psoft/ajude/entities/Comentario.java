@@ -21,7 +21,6 @@ public class Comentario {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "email")
-    @JsonIgnore
     private Usuario usuarioQComentou;
 
     private boolean status;

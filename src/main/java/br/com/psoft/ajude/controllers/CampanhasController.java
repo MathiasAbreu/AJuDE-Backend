@@ -44,20 +44,19 @@ public class CampanhasController {
     }
 
     @PostMapping("/adiciona")
-    public ResponseEntity<String> adicionaCampanha(@RequestHeader("Authorization") String header, @RequestBody Campanha campanha) {
+    public ResponseEntity<Campanha> adicionaCampanha(@RequestHeader("Authorization") String header, @RequestBody Campanha campanha) {
 
         try {
 
-            if(jwtService.usuarioExiste(header)) {
+            if (jwtService.usuarioExiste(header)) {
 
-                campanhasService.adicionaCampanha(campanha,jwtService.getUsuarioDoToken(header));
-                return new ResponseEntity<String>("Campanha cadastrada!", HttpStatus.CREATED);
+                return new ResponseEntity<Campanha>(campanhasService.adicionaCampanha(campanha, jwtService.getUsuarioDoToken(header)), HttpStatus.CREATED);
             }
 
-            return new ResponseEntity<>(HttpStatus.NON_AUTHORITATIVE_INFORMATION);
-        } catch (Exception exc) {
+            throw new UserNotFoundException();
+        } catch (UserException err) {
 
-            return new ResponseEntity<String>(exc.getMessage(), HttpStatus.CONFLICT);
+            return new ResponseEntity<Campanha>(new Campanha(), HttpStatus.UNAUTHORIZED);
         }
     }
 
@@ -82,38 +81,42 @@ public class CampanhasController {
         }
     }
 
-    @PostMapping("/addComentario")
-    public ResponseEntity<Campanha> adicionarComentario(@RequestHeader("Authorization") String header, @RequestBody List<String> parametros) {
+    @PostMapping("{identificadorURL}/addComentario")
+    public ResponseEntity<Campanha> adicionarComentario(@RequestHeader("Authorization") String header, @PathVariable String identificadorURL, @RequestBody List<String> parametros) {
 
         try {
 
             if(jwtService.usuarioExiste(header)) {
 
-                return new ResponseEntity<Campanha>(campanhasService.adicionaComentario(jwtService.getUsuarioDoToken(header),parametros),HttpStatus.CREATED);
+                return new ResponseEntity<Campanha>(campanhasService.adicionaComentario(jwtService.getUsuarioDoToken(header),identificadorURL,parametros),HttpStatus.CREATED);
             }
             throw new UserNotFoundException();
 
         } catch (UserException err) {
 
-            return new ResponseEntity<Campanha>(new Campanha(), HttpStatus.NON_AUTHORITATIVE_INFORMATION);
+            return new ResponseEntity<Campanha>(new Campanha(), HttpStatus.UNAUTHORIZED);
         } catch (CampaignException | CommentException err) {
 
             return new ResponseEntity<Campanha>(new Campanha(), HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
-    @DeleteMapping("/delComentario")
-    public ResponseEntity<Campanha> deletarComentario(@RequestHeader("Authorization") String header, @RequestBody List<String> parametros) {
+    @DeleteMapping("{identificadorURL}/delComentario")
+    public ResponseEntity<Campanha> deletarComentario(@RequestHeader("Authorization") String header, @PathVariable String identificadorURL, @RequestBody String idComentario) {
 
         try {
 
-            if(jwtService.usuarioExiste(header)) {
+            if (jwtService.usuarioExiste(header)) {
 
-                return new ResponseEntity<Campanha>(campanhasService.deletarComentario(jwtService.getUsuarioDoToken(header),parametros),HttpStatus.OK);
+                return new ResponseEntity<Campanha>(campanhasService.deletarComentario(jwtService.getUsuarioDoToken(header), identificadorURL, idComentario), HttpStatus.OK);
             }
 
             throw new UserNotFoundException();
-        } catch (UserException | CampaignException err) {
+        } catch (UserException err) {
+
+            return new ResponseEntity<Campanha>(new Campanha(), HttpStatus.UNAUTHORIZED);
+
+        } catch (CampaignException err) {
 
             return new ResponseEntity<Campanha>(new Campanha(),HttpStatus.NOT_FOUND);
         }
