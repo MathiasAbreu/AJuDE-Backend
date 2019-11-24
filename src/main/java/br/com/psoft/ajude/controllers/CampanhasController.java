@@ -1,7 +1,6 @@
 package br.com.psoft.ajude.controllers;
 
 import br.com.psoft.ajude.entities.Campanha;
-import br.com.psoft.ajude.entities.Comentario;
 import br.com.psoft.ajude.exceptions.*;
 import br.com.psoft.ajude.services.CampanhasService;
 import br.com.psoft.ajude.services.JWTService;
@@ -26,20 +25,102 @@ public class CampanhasController {
         this.campanhasService = campanhasService;
     }
 
-    @GetMapping("/busca")
-    public ResponseEntity<Campanha> getCampanha(@RequestHeader("Authorization") String header, @RequestBody Campanha campanha) {
+    @GetMapping("{identificadorURL}/busca")
+    public ResponseEntity<Campanha> buscaCampanha(@RequestHeader("Authorization") String header, @PathVariable String identificadorURL) {
+
+        try {
+
+            if (jwtService.usuarioExiste(header)) {
+
+                return new ResponseEntity<Campanha>(campanhasService.buscaCampanha(identificadorURL), HttpStatus.OK);
+            }
+            throw new UserNotFoundException();
+        } catch (UserException err) {
+
+            return new ResponseEntity<Campanha>(new Campanha(), HttpStatus.UNAUTHORIZED);
+        } catch (CampaignNotFoundException err) {
+
+            return new ResponseEntity<Campanha>(new Campanha(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping("{identificadorURL}/descricao")
+    public ResponseEntity atualizaDescricaoCampanha(@RequestHeader("Authorization") String header, @PathVariable String identificadorURL, @RequestBody String novaDescricao) {
 
         try {
 
             if(jwtService.usuarioExiste(header)) {
 
-                return new ResponseEntity<Campanha>(campanhasService.getCampanha(campanha), HttpStatus.OK);
+                return new ResponseEntity<Campanha>(campanhasService.atualizaDescricaoCampanha(jwtService.getUsuarioDoToken(header),identificadorURL,novaDescricao), HttpStatus.OK);
             }
-            return new ResponseEntity<Campanha>(new Campanha(), HttpStatus.NON_AUTHORITATIVE_INFORMATION);
 
-        } catch (UserException | CampaignNotFoundException userErr) {
+            throw new UserNotFoundException();
+        } catch (UserException err) {
 
-            return new ResponseEntity<Campanha>(new Campanha(), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(err.getMessage(),HttpStatus.UNAUTHORIZED);
+        } catch (CampaignException err) {
+
+            return new ResponseEntity<>(err.getMessage(),HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping("{identificadorURL}/data")
+    public ResponseEntity atualizaDataCampanha(@RequestHeader("Authorization") String header, @PathVariable String identificadorURL, @RequestBody String novaData) {
+
+        try {
+
+            if(jwtService.usuarioExiste(header)) {
+
+                return new ResponseEntity<Campanha>(campanhasService.atualizaDataCampanha(jwtService.getUsuarioDoToken(header),identificadorURL,novaData), HttpStatus.OK);
+            }
+
+            throw new UserNotFoundException();
+        } catch (UserException err) {
+
+            return new ResponseEntity<>(err.getMessage(),HttpStatus.UNAUTHORIZED);
+        } catch (CampaignException err) {
+
+            return new ResponseEntity<>(err.getMessage(),HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping("{identificadorURL}/status")
+    public ResponseEntity atualizaStatusCampanha(@RequestHeader("Authorization") String header, @PathVariable String identificadorURL, @RequestBody String novoStatus) {
+
+        try {
+
+            if(jwtService.usuarioExiste(header)) {
+
+                return new ResponseEntity<Campanha>(campanhasService.atualizaStatusCampanha(jwtService.getUsuarioDoToken(header),identificadorURL,novoStatus), HttpStatus.OK);
+            }
+
+            throw new UserNotFoundException();
+        } catch (UserException err) {
+
+            return new ResponseEntity<>(err.getMessage(),HttpStatus.UNAUTHORIZED);
+        } catch (CampaignException err) {
+
+            return new ResponseEntity<>(err.getMessage(),HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping("{identificadorURL}/meta")
+    public ResponseEntity atualizaMetaCampanha(@RequestHeader("Authorization") String header, @PathVariable String identificadorURL, @RequestBody Double novaMeta) {
+
+        try {
+
+            if(jwtService.usuarioExiste(header)) {
+
+                return new ResponseEntity<Campanha>(campanhasService.atualizaMetaCampanha(jwtService.getUsuarioDoToken(header),identificadorURL,novaMeta), HttpStatus.OK);
+            }
+
+            throw new UserNotFoundException();
+        } catch (UserException err) {
+
+            return new ResponseEntity<>(err.getMessage(),HttpStatus.UNAUTHORIZED);
+        } catch (CampaignException err) {
+
+            return new ResponseEntity<>(err.getMessage(),HttpStatus.NOT_FOUND);
         }
     }
 

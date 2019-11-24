@@ -6,10 +6,7 @@ import br.com.psoft.ajude.daos.UsuariosRepository;
 import br.com.psoft.ajude.entities.Campanha;
 import br.com.psoft.ajude.entities.Comentario;
 import br.com.psoft.ajude.entities.Usuario;
-import br.com.psoft.ajude.exceptions.CampaignException;
-import br.com.psoft.ajude.exceptions.CampaignNotFoundException;
-import br.com.psoft.ajude.exceptions.CommentParametersInsufficientException;
-import br.com.psoft.ajude.exceptions.UserNotFoundException;
+import br.com.psoft.ajude.exceptions.*;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -33,17 +30,82 @@ public class CampanhasService {
         this.comentariosRepository = comentariosRepository;
     }
 
-    public Campanha getCampanha(Campanha camp) throws CampaignNotFoundException {
+    public Campanha buscaCampanha(String identificadorURL) throws CampaignNotFoundException {
 
         List<Campanha> campanhas = campanhasDao.findAll();
 
         for(Campanha campanha: campanhas) {
 
-            if(campanha.getIdentificadorURL().equals(camp.getIdentificadorURL()))
+            if(campanha.getIdentificadorURL().equals(identificadorURL))
                 return campanha;
         }
 
-        throw new CampaignNotFoundException(camp.getIdentificadorURL());
+        throw new CampaignNotFoundException(identificadorURL);
+    }
+
+    public Campanha atualizaDescricaoCampanha(String usuario, String identificadorURL, String novaDescricao) throws CampaignException, UserException {
+
+        Campanha campanha = buscaCampanha(identificadorURL);
+
+        if(campanha.getUsuario().getEmail().equals(usuario)) {
+
+            return (campanhasDao.findById(campanha.getId()).map(record -> {
+
+                System.out.println(novaDescricao);
+                record.setDescricao(novaDescricao);
+                return campanhasDao.save(record);
+            })).get();
+        }
+
+        throw new UserNotAuthorizedForProcedure();
+    }
+
+    public Campanha atualizaStatusCampanha(String usuario, String identificadorURL, String novoStatus) throws CampaignException, UserException {
+
+        Campanha campanha = buscaCampanha(identificadorURL);
+
+        if(campanha.getUsuario().getEmail().equals(usuario)) {
+
+            return (campanhasDao.findById(campanha.getId()).map(record -> {
+
+                record.setStatus(novoStatus);
+                return campanhasDao.save(record);
+            })).get();
+        }
+
+        throw new UserNotAuthorizedForProcedure();
+    }
+
+    public Campanha atualizaMetaCampanha(String usuario, String identificadorURL, double novaMeta) throws CampaignException, UserException {
+
+        Campanha campanha = buscaCampanha(identificadorURL);
+
+        if(campanha.getUsuario().getEmail().equals(usuario)) {
+
+            return (campanhasDao.findById(campanha.getId()).map(record -> {
+
+                record.setMeta(novaMeta);
+                return campanhasDao.save(record);
+            })).get();
+        }
+
+        throw new UserNotAuthorizedForProcedure();
+    }
+
+    public Campanha atualizaDataCampanha(String usuario, String identificadorURL, String novaData) throws CampaignException, UserException {
+
+        Campanha campanha = buscaCampanha(identificadorURL);
+
+        if(campanha.getUsuario().getEmail().equals(usuario)) {
+
+            return (campanhasDao.findById(campanha.getId()).map(record -> {
+
+                record.setDataDeadline(novaData);
+                return campanhasDao.save(record);
+            })).get();
+        }
+
+        throw new UserNotAuthorizedForProcedure();
     }
 
     public Campanha adicionaCampanha(Campanha campanha,String emailUser) throws UserNotFoundException {
@@ -124,8 +186,7 @@ public class CampanhasService {
         if(!user.isPresent())
             throw new CommentParametersInsufficientException();
 
-        Campanha campanha = new Campanha(identificadorURL);
-        campanha = getCampanha(campanha);
+        Campanha campanha = buscaCampanha(identificadorURL);
 
         Comentario comentario = new Comentario(parametros.get(1),campanha,user.get());
 
@@ -156,9 +217,7 @@ public class CampanhasService {
     //idComentario
     public Campanha deletarComentario(String emailUser, String identificadorURL, String idComentario) throws CampaignNotFoundException {
 
-        Campanha campanha = new Campanha();
-        campanha.setIdentificadorURL(identificadorURL);
-        campanha = getCampanha(campanha);
+        Campanha campanha = buscaCampanha(identificadorURL);
 
         List<Comentario> comentarios = campanha.getComentarios();
         for(int i = 0; i < comentarios.size(); i++) {
