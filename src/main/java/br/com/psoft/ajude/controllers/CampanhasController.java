@@ -26,7 +26,7 @@ public class CampanhasController {
     }
 
     @GetMapping("{identificadorURL}/busca")
-    public ResponseEntity<Campanha> buscaCampanha(@RequestHeader("Authorization") String header, @PathVariable String identificadorURL) {
+    public ResponseEntity buscaCampanha(@RequestHeader("Authorization") String header, @PathVariable String identificadorURL) {
 
         try {
 
@@ -37,10 +37,10 @@ public class CampanhasController {
             throw new UserNotFoundException();
         } catch (UserException err) {
 
-            return new ResponseEntity<Campanha>(new Campanha(), HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(err.getMessage(), HttpStatus.UNAUTHORIZED);
         } catch (CampaignNotFoundException err) {
 
-            return new ResponseEntity<Campanha>(new Campanha(), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(err.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
 
@@ -51,7 +51,7 @@ public class CampanhasController {
 
             if(jwtService.usuarioExiste(header)) {
 
-                return new ResponseEntity<Campanha>(campanhasService.atualizaDescricaoCampanha(jwtService.getUsuarioDoToken(header),identificadorURL,novaDescricao), HttpStatus.OK);
+                return new ResponseEntity<>(campanhasService.atualizaDescricaoCampanha(jwtService.getUsuarioDoToken(header),identificadorURL,novaDescricao), HttpStatus.OK);
             }
 
             throw new UserNotFoundException();
@@ -71,7 +71,7 @@ public class CampanhasController {
 
             if(jwtService.usuarioExiste(header)) {
 
-                return new ResponseEntity<Campanha>(campanhasService.atualizaDataCampanha(jwtService.getUsuarioDoToken(header),identificadorURL,novaData), HttpStatus.OK);
+                return new ResponseEntity<>(campanhasService.atualizaDataCampanha(jwtService.getUsuarioDoToken(header),identificadorURL,novaData), HttpStatus.OK);
             }
 
             throw new UserNotFoundException();
@@ -91,7 +91,7 @@ public class CampanhasController {
 
             if(jwtService.usuarioExiste(header)) {
 
-                return new ResponseEntity<Campanha>(campanhasService.atualizaStatusCampanha(jwtService.getUsuarioDoToken(header),identificadorURL,novoStatus), HttpStatus.OK);
+                return new ResponseEntity<>(campanhasService.atualizaStatusCampanha(jwtService.getUsuarioDoToken(header),identificadorURL,novoStatus), HttpStatus.OK);
             }
 
             throw new UserNotFoundException();
@@ -111,7 +111,7 @@ public class CampanhasController {
 
             if(jwtService.usuarioExiste(header)) {
 
-                return new ResponseEntity<Campanha>(campanhasService.atualizaMetaCampanha(jwtService.getUsuarioDoToken(header),identificadorURL,novaMeta), HttpStatus.OK);
+                return new ResponseEntity<>(campanhasService.atualizaMetaCampanha(jwtService.getUsuarioDoToken(header),identificadorURL,novaMeta), HttpStatus.OK);
             }
 
             throw new UserNotFoundException();
@@ -125,81 +125,81 @@ public class CampanhasController {
     }
 
     @PostMapping("/adiciona")
-    public ResponseEntity<Campanha> adicionaCampanha(@RequestHeader("Authorization") String header, @RequestBody Campanha campanha) {
+    public ResponseEntity adicionaCampanha(@RequestHeader("Authorization") String header, @RequestBody Campanha campanha) {
 
         try {
 
             if (jwtService.usuarioExiste(header)) {
 
-                return new ResponseEntity<Campanha>(campanhasService.adicionaCampanha(campanha, jwtService.getUsuarioDoToken(header)), HttpStatus.CREATED);
+                return new ResponseEntity<>(campanhasService.adicionaCampanha(campanha, jwtService.getUsuarioDoToken(header)), HttpStatus.CREATED);
             }
 
             throw new UserNotFoundException();
         } catch (UserException err) {
 
-            return new ResponseEntity<Campanha>(new Campanha(), HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(err.getMessage(), HttpStatus.UNAUTHORIZED);
         }
     }
 
     @GetMapping("/buscaSubstring")
-    public ResponseEntity<List<Campanha>> buscaCampanhaPorSubstring(@RequestHeader("Authorization") String header, @RequestBody List<String> parametrosBusca) {
+    public ResponseEntity buscaCampanhaPorSubstring(@RequestHeader("Authorization") String header, @RequestBody List<String> parametrosBusca) {
 
         try {
 
             if(jwtService.usuarioExiste(header)) {
 
                 if(parametrosBusca.size() == 1)
-                    return new ResponseEntity<List<Campanha>>(campanhasService.buscarCampanhaPorSubstring(parametrosBusca.get(0)),HttpStatus.OK);
+                    return new ResponseEntity<>(campanhasService.buscarCampanhaPorSubstring(parametrosBusca.get(0)),HttpStatus.OK);
                 else
-                    return new ResponseEntity<List<Campanha>>(campanhasService.buscarCampanhaPorSubstring(parametrosBusca.get(0),parametrosBusca),HttpStatus.OK);
+                    return new ResponseEntity<>(campanhasService.buscarCampanhaPorSubstring(parametrosBusca.get(0),parametrosBusca),HttpStatus.OK);
 
             }
 
             throw new UserNotFoundException();
         } catch (UserException userExc) {
 
-            return new ResponseEntity<List<Campanha>>(new ArrayList<>(),HttpStatus.NON_AUTHORITATIVE_INFORMATION);
+            return new ResponseEntity<>(userExc.getMessage(),HttpStatus.UNAUTHORIZED);
         }
     }
 
     @PostMapping("{identificadorURL}/addComentario")
-    public ResponseEntity<Campanha> adicionarComentario(@RequestHeader("Authorization") String header, @PathVariable String identificadorURL, @RequestBody List<String> parametros) {
+    public ResponseEntity adicionarComentario(@RequestHeader("Authorization") String header, @PathVariable String identificadorURL, @RequestBody List<String> parametros) {
 
         try {
 
             if(jwtService.usuarioExiste(header)) {
 
-                return new ResponseEntity<Campanha>(campanhasService.adicionaComentario(jwtService.getUsuarioDoToken(header),identificadorURL,parametros),HttpStatus.CREATED);
+                return new ResponseEntity<>(campanhasService.adicionaComentario(jwtService.getUsuarioDoToken(header),identificadorURL,parametros),HttpStatus.CREATED);
             }
             throw new UserNotFoundException();
 
         } catch (UserException err) {
 
-            return new ResponseEntity<Campanha>(new Campanha(), HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(err.getMessage(), HttpStatus.UNAUTHORIZED);
         } catch (CampaignException | CommentException err) {
 
-            return new ResponseEntity<Campanha>(new Campanha(), HttpStatus.SERVICE_UNAVAILABLE);
+            return new ResponseEntity<>(err.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
     @DeleteMapping("{identificadorURL}/delComentario")
-    public ResponseEntity<Campanha> deletarComentario(@RequestHeader("Authorization") String header, @PathVariable String identificadorURL, @RequestBody String idComentario) {
+    public ResponseEntity deletarComentario(@RequestHeader("Authorization") String header, @PathVariable String identificadorURL, @RequestBody String idComentario) {
 
         try {
 
             if (jwtService.usuarioExiste(header)) {
 
-                return new ResponseEntity<Campanha>(campanhasService.deletarComentario(jwtService.getUsuarioDoToken(header), identificadorURL, idComentario), HttpStatus.OK);
+                return new ResponseEntity<>(campanhasService.deletarComentario(jwtService.getUsuarioDoToken(header), identificadorURL, idComentario), HttpStatus.OK);
             }
 
             throw new UserNotFoundException();
         } catch (UserException err) {
 
-            return new ResponseEntity<Campanha>(new Campanha(), HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(err.getMessage(), HttpStatus.UNAUTHORIZED);
 
         } catch (CampaignException err) {
 
-            return new ResponseEntity<Campanha>(new Campanha(),HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(err.getMessage(),HttpStatus.NOT_FOUND);
         }
     }
 
