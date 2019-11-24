@@ -1,6 +1,7 @@
 package br.com.psoft.ajude.entities;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 
@@ -12,19 +13,26 @@ public class Curtida {
 
     @ManyToOne
     @JoinColumn(name = "id")
+    @JsonIgnore
     private Campanha campanhaCurtida;
 
     @ManyToOne
     @JoinColumn(name = "email")
     private Usuario usuarioQCurtiu;
 
-    @JsonCreator
     public Curtida(Long idCurtida, Campanha campanhaCurtida, Usuario usuarioQCurtiu) {
 
         super();
         this.idCurtida = idCurtida;
         this.campanhaCurtida = campanhaCurtida;
         this.usuarioQCurtiu = usuarioQCurtiu;
+    }
+
+    public Curtida(Campanha campanha, Usuario usuario) {
+
+        super();
+        this.campanhaCurtida = campanha;
+        this.usuarioQCurtiu = usuario;
     }
 
     @JsonCreator

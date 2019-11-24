@@ -223,7 +223,7 @@ public class CampanhasController {
         }
     }
 
-    @DeleteMapping("{identificadorURL/delLike")
+    @DeleteMapping("{identificadorURL}/delLike")
     public ResponseEntity removerLike(@RequestHeader("Authorization") String header, @PathVariable String identificadorURL) {
 
         try {
@@ -243,7 +243,7 @@ public class CampanhasController {
         }
     }
 
-    @PostMapping("{identificadorURL/doacao")
+    @PostMapping("{identificadorURL}/doacao")
     public ResponseEntity realizarDoacao(@RequestHeader("Authorization") String header, @PathVariable String identificadorURL, @RequestBody Double doacao) {
 
         try {

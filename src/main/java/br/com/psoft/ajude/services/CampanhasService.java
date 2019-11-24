@@ -205,7 +205,7 @@ public class CampanhasService {
         if(!usuario.isPresent())
             throw new UserNotFoundException();
 
-        Curtida curtida = new Curtida();
+        Curtida curtida = new Curtida(campanha,usuario.get());
 
         return (campanhasDao.findById(campanha.getId()).map(record -> {
 
@@ -216,16 +216,29 @@ public class CampanhasService {
         })).get();
     }
 
-    public Campanha deletaLike(String emailUsuario, String identificadorURL) throws CampaignException, UserException {
+    public Campanha deletaLike(String emailUsuario, String identificadorURL) throws CampaignException {
 
         Campanha campanha = buscaCampanha(identificadorURL);
-        return (campanhasDao.findById(campanha.getId()).map(record -> {
+        List<Curtida> curtidas = campanha.getCurtidas();
 
-            record.deletaCurtida(emailUsuario);
-            return campanhasDao.save(record);
+        for(int i = 0; i < curtidas.size(); i++) {
 
-        })).get();
+            Curtida curtida = curtidas.get(i);
+            if(curtida.getUsuarioQCurtiu().getEmail().equals(emailUsuario)) {
+
+                return (campanhasDao.findById(campanha.getId()).map(record -> {
+
+                    record.deletaCurtida(emailUsuario);
+                    curtidasDao.delete(curtida);
+                    return campanhasDao.save(record);
+
+                })).get();
+            }
+        }
+
+        throw new CampaignException();
     }
+
     //idComentario
     public Campanha deletarComentario(String emailUser, String identificadorURL, String idComentario) throws CampaignNotFoundException {
 
@@ -274,9 +287,9 @@ public class CampanhasService {
         Campanha campanha = buscaCampanha(identificadorURL);
         Doacao doacao = new Doacao(campanha,usuario.get(),valorDoado);
 
+        doacao = doacoesDao.save(doacao);
         double retorno = adicionarDoacaoNaCampanha(campanha,doacao);
         adicionarDoacaoNoUsuario(usuario.get(), doacao);
-        doacoesDao.save(doacao);
 
         return retorno;
 

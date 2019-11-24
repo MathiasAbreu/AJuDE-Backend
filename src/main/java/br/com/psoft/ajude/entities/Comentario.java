@@ -41,7 +41,6 @@ public class Comentario {
         this.status = true;
     }
 
-    @JsonCreator
     public Comentario(String conteudo, Campanha campanha, Usuario usuarioQComentou) {
 
         this.conteudo = conteudo;

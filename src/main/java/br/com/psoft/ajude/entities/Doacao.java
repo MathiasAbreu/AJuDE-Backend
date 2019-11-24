@@ -16,6 +16,7 @@ public class Doacao {
 
     @ManyToOne
     @JoinColumn(name = "id")
+    @JsonIgnore
     private Campanha campanhaAlvo;
 
     @ManyToOne
@@ -23,13 +24,11 @@ public class Doacao {
     private Usuario usuarioDoador;
 
     @JsonCreator
-    public Doacao(Long idDoacao, double valorDoado, Campanha campanhaAlvo, Usuario usuarioDoador) {
+    public Doacao(Long idDoacao, double valorDoado) {
 
         super();
         this.idDoacao = idDoacao;
         this.valorDoado = valorDoado;
-        this.campanhaAlvo = campanhaAlvo;
-        this.usuarioDoador = usuarioDoador;
     }
 
     @JsonCreator
@@ -38,7 +37,6 @@ public class Doacao {
         super();
     }
 
-    @JsonCreator
     public Doacao(Campanha campanha, Usuario usuario, double valorDoado) {
 
         super();

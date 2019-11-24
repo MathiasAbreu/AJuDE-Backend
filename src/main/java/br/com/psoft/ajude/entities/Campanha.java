@@ -31,7 +31,6 @@ public class Campanha {
     private List<Comentario> comentarios = new ArrayList<>();
 
     @OneToMany(mappedBy = "campanhaAlvo", fetch = FetchType.LAZY)
-    @JsonIgnore
     private List<Doacao> doacoes = new ArrayList<>();
 
     @OneToMany(mappedBy = "campanhaCurtida", fetch = FetchType.LAZY)
@@ -173,12 +172,11 @@ public class Campanha {
 
     public void deletaCurtida(String emailUsuario) {
 
-        for(int i = 0; i < curtidas.size(); i++) {
+        for(Curtida curtida : curtidas) {
 
-            if(curtidas.get(i).getUsuarioQCurtiu().getEmail().equals(emailUsuario)) {
+            if(curtida.getUsuarioQCurtiu().getEmail().equals(emailUsuario)) {
 
-                curtidas.remove(i);
-                return;
+                curtidas.remove(curtida);
             }
         }
     }

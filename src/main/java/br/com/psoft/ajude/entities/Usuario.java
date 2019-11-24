@@ -27,11 +27,9 @@ public class Usuario {
     private String senha;
 
     @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
-    @JsonIgnore
     private List<Campanha> campanhas = new ArrayList<>();
 
     @OneToMany(mappedBy = "usuarioDoador", fetch = FetchType.LAZY)
-    @JsonIgnore
     private List<Doacao> doacoes = new ArrayList<>();
 
     @JsonCreator
@@ -93,6 +91,7 @@ public class Usuario {
         this.senha = senha;
     }
 
+    @JsonIgnore
     public List<Campanha> getCampanhas() {
         return campanhas;
     }
@@ -101,6 +100,7 @@ public class Usuario {
         this.campanhas = campanhas;
     }
 
+    @JsonIgnore
     public List<Doacao> getDoacoes() {
         return doacoes;
     }
