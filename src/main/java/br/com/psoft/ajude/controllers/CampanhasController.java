@@ -124,6 +124,12 @@ public class CampanhasController {
         }
     }
 
+    @GetMapping("/buscaTotal")
+    public ResponseEntity retornarCampanhas(@RequestBody String parametroOrdenacao) {
+
+        return new ResponseEntity<List<Campanha>>(campanhasService.retornarCampanhasOrdenadas(parametroOrdenacao), HttpStatus.OK);
+    }
+
     @PostMapping("/adiciona")
     public ResponseEntity adicionaCampanha(@RequestHeader("Authorization") String header, @RequestBody Campanha campanha) {
 

@@ -1,12 +1,13 @@
 package br.com.psoft.ajude.entities;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.util.*;
 
 @Entity
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Campanha {
 
     @Id @GeneratedValue
@@ -21,7 +22,6 @@ public class Campanha {
     private String status;
 
     private double meta;
-    private double valorDoado;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "email")
@@ -47,7 +47,6 @@ public class Campanha {
         this.meta = meta;
 
         this.status = "Ativa";
-        this.valorDoado = 0;
     }
 
     @JsonCreator
@@ -113,14 +112,6 @@ public class Campanha {
         this.status = status;
     }
 
-    public double getValorDoado() {
-        return valorDoado;
-    }
-
-    public void setValorDoado(double valorDoado) {
-        this.valorDoado = valorDoado;
-    }
-
     public Usuario getUsuario() {
         return usuario;
     }
@@ -133,12 +124,24 @@ public class Campanha {
         return comentarios;
     }
 
+    public void setComentarios(List<Comentario> comentarios) {
+        this.comentarios = comentarios;
+    }
+
     public List<Curtida> getCurtidas() {
         return curtidas;
     }
 
+    public void setCurtidas(List<Curtida> curtidas) {
+        this.curtidas = curtidas;
+    }
+
     public List<Doacao> getDoacoes() {
         return doacoes;
+    }
+
+    public void setDoacoes(List<Doacao> doacoes) {
+        this.doacoes = doacoes;
     }
 
     public void adicionaComentario(Comentario comentario) {
@@ -192,6 +195,11 @@ public class Campanha {
         for(Doacao doacao : doacoes)
             retorno += doacao.getValorDoado();
         return (meta - retorno);
+    }
+
+    public int getQuantidadeLikes() {
+
+        return curtidas.size();
     }
 
     @Override

@@ -3,11 +3,12 @@ package br.com.psoft.ajude.services;
 import br.com.psoft.ajude.daos.*;
 import br.com.psoft.ajude.entities.*;
 import br.com.psoft.ajude.exceptions.*;
+import br.com.psoft.ajude.services.comparators.ComparatorCampanhaPorData;
+import br.com.psoft.ajude.services.comparators.ComparatorCampanhaPorLikes;
+import br.com.psoft.ajude.services.comparators.ComparatorCampanhaPorMeta;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class CampanhasService {
@@ -312,5 +313,28 @@ public class CampanhasService {
             record.adicionaDoacao(doacao);
             return usuariosDao.save(record);
         });
+    }
+
+    public List<Campanha> retornarCampanhasOrdenadas(String parametroOrdenacao) {
+
+        Comparator<Campanha> comparator = escolheCriterio(parametroOrdenacao);
+
+        List<Campanha> campanhas = campanhasDao.findAll();
+
+        if(campanhas.size() > 0)
+            campanhas.sort(comparator);
+
+        return campanhas;
+    }
+
+    private Comparator<Campanha> escolheCriterio(String parametroOrdenacao) {
+
+        if(parametroOrdenacao.equals("data"))
+            return new ComparatorCampanhaPorData();
+
+        if(parametroOrdenacao.equals("likes"))
+            return new ComparatorCampanhaPorLikes();
+
+        return new ComparatorCampanhaPorMeta();
     }
 }
