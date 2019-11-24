@@ -31,6 +31,7 @@ public class Usuario {
     private List<Campanha> campanhas = new ArrayList<>();
 
     @OneToMany(mappedBy = "usuarioDoador", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Doacao> doacoes = new ArrayList<>();
 
     @JsonCreator
@@ -110,5 +111,9 @@ public class Usuario {
 
     public void adicionaCampanha(Campanha campanha) {
         campanhas.add(campanha);
+    }
+
+    public void adicionaDoacao(Doacao doacao) {
+        doacoes.add(doacao);
     }
 }

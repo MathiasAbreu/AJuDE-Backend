@@ -1,6 +1,7 @@
 package br.com.psoft.ajude.entities;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.*;
@@ -30,6 +31,7 @@ public class Campanha {
     private List<Comentario> comentarios = new ArrayList<>();
 
     @OneToMany(mappedBy = "campanhaAlvo", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Doacao> doacoes = new ArrayList<>();
 
     @OneToMany(mappedBy = "campanhaCurtida", fetch = FetchType.LAZY)
@@ -165,18 +167,35 @@ public class Campanha {
         }
     }
 
-    /*public List<Like> getLikes() {
-
-        List<Like> retornoLikes = new ArrayList<>();
-        for(Like like : likes)
-            retornoLikes.add(like);
-
-        return retornoLikes;
+    public void adicionaCurtida(Curtida curtida) {
+        this.curtidas.add(curtida);
     }
 
-    public void adicionaLike(Like like) {
-        this.likes.add(like);
-    }*/
+    public void deletaCurtida(String emailUsuario) {
+
+        for(int i = 0; i < curtidas.size(); i++) {
+
+            if(curtidas.get(i).getUsuarioQCurtiu().getEmail().equals(emailUsuario)) {
+
+                curtidas.remove(i);
+                return;
+            }
+        }
+    }
+
+    public void adicionaDoacao(Doacao doacao) {
+        this.doacoes.add(doacao);
+    }
+
+    public double valorRestante() {
+
+        double retorno = 0;
+
+        for(Doacao doacao : doacoes)
+            retorno += doacao.getValorDoado();
+        return (meta - retorno);
+    }
+
     @Override
     public String toString() {
         return String.format("Campanha:\n ID: %d\n Nome: %s\n Descrição: %s\n Identificador URL: %s\n Data final: %s\n Meta: %.2f\n",id,nome,descricao,identificadorURL,dataDeadline,meta) + "[" + usuario.toString() + "]";

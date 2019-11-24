@@ -1,11 +1,7 @@
 package br.com.psoft.ajude.services;
 
-import br.com.psoft.ajude.daos.CampanhasRepository;
-import br.com.psoft.ajude.daos.ComentariosRepository;
-import br.com.psoft.ajude.daos.UsuariosRepository;
-import br.com.psoft.ajude.entities.Campanha;
-import br.com.psoft.ajude.entities.Comentario;
-import br.com.psoft.ajude.entities.Usuario;
+import br.com.psoft.ajude.daos.*;
+import br.com.psoft.ajude.entities.*;
 import br.com.psoft.ajude.exceptions.*;
 import org.springframework.stereotype.Service;
 
@@ -16,15 +12,17 @@ import java.util.Optional;
 @Service
 public class CampanhasService {
 
-    //private LikesRepository<Like, String> likesDao;
+    private DoacoesRepository<Doacao, Long> doacoesDao;
+    private CurtidasRepository<Curtida, Long> curtidasDao;
     private UsuariosRepository<Usuario, String> usuariosDao;
     private CampanhasRepository<Campanha, Long> campanhasDao;
     private ComentariosRepository<Comentario, Long> comentariosRepository;
 
-    public CampanhasService(/*LikesRepository<Like, String> likesDao,*/ CampanhasRepository<Campanha, Long> campanhasDao, UsuariosRepository<Usuario, String> usuariosDao, ComentariosRepository<Comentario, Long> comentariosRepository) {
+    public CampanhasService(DoacoesRepository<Doacao, Long> doacoesDao, CurtidasRepository<Curtida, Long> curtidasDao, CampanhasRepository<Campanha, Long> campanhasDao, UsuariosRepository<Usuario, String> usuariosDao, ComentariosRepository<Comentario, Long> comentariosRepository) {
 
         super();
-        //this.likesDao = likesDao;
+        this.doacoesDao = doacoesDao;
+        this.curtidasDao = curtidasDao;
         this.usuariosDao = usuariosDao;
         this.campanhasDao = campanhasDao;
         this.comentariosRepository = comentariosRepository;
@@ -199,21 +197,35 @@ public class CampanhasService {
         throw new CommentParametersInsufficientException();
     }
 
-    /*public Campanha adicionaLike(String emailUser, String identificadorURL) throws CampaignException {
+    public Campanha adicionaLike(String emailUser, String identificadorURL) throws CampaignException, UserNotFoundException {
 
-        Campanha campanha = new Campanha(identificadorURL);
-        campanha = getCampanha(campanha);
+        Campanha campanha = buscaCampanha(identificadorURL);
+        Optional<Usuario> usuario = usuariosDao.findById(emailUser);
 
-        Like like = new Like(emailUser);
+        if(!usuario.isPresent())
+            throw new UserNotFoundException();
+
+        Curtida curtida = new Curtida();
 
         return (campanhasDao.findById(campanha.getId()).map(record -> {
 
-            //record.adicionaLike(like);
-            likesDao.save(like);
+            record.adicionaCurtida(curtida);
+            curtidasDao.save(curtida);
             return campanhasDao.save(record);
 
         })).get();
-    }*/
+    }
+
+    public Campanha deletaLike(String emailUsuario, String identificadorURL) throws CampaignException, UserException {
+
+        Campanha campanha = buscaCampanha(identificadorURL);
+        return (campanhasDao.findById(campanha.getId()).map(record -> {
+
+            record.deletaCurtida(emailUsuario);
+            return campanhasDao.save(record);
+
+        })).get();
+    }
     //idComentario
     public Campanha deletarComentario(String emailUser, String identificadorURL, String idComentario) throws CampaignNotFoundException {
 
@@ -250,5 +262,42 @@ public class CampanhasService {
             }
         }
         return campanha;
+    }
+
+    public double realizarDoacao(String emailUsuario, String identificadorURL, Double valorDoado) throws CampaignException, UserException {
+
+        Optional<Usuario> usuario = usuariosDao.findById(emailUsuario);
+
+        if(!usuario.isPresent())
+            throw new UserNotFoundException();
+
+        Campanha campanha = buscaCampanha(identificadorURL);
+        Doacao doacao = new Doacao(campanha,usuario.get(),valorDoado);
+
+        double retorno = adicionarDoacaoNaCampanha(campanha,doacao);
+        adicionarDoacaoNoUsuario(usuario.get(), doacao);
+        doacoesDao.save(doacao);
+
+        return retorno;
+
+    }
+
+    private double adicionarDoacaoNaCampanha(Campanha campanha, Doacao doacao) {
+
+        return campanhasDao.findById(campanha.getId()).map(record -> {
+
+            record.adicionaDoacao(doacao);
+            campanhasDao.save(record);
+            return record.valorRestante();
+        }).get();
+    }
+
+    private void adicionarDoacaoNoUsuario(Usuario usuario, Doacao doacao) {
+
+        usuariosDao.findById(usuario.getEmail()).map(record -> {
+
+            record.adicionaDoacao(doacao);
+            return usuariosDao.save(record);
+        });
     }
 }

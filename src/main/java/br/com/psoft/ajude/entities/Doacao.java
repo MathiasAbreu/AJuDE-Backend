@@ -2,6 +2,7 @@ package br.com.psoft.ajude.entities;
 
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 
@@ -35,6 +36,15 @@ public class Doacao {
     public Doacao() {
 
         super();
+    }
+
+    @JsonCreator
+    public Doacao(Campanha campanha, Usuario usuario, double valorDoado) {
+
+        super();
+        this.campanhaAlvo = campanha;
+        this.usuarioDoador = usuario;
+        this.valorDoado = valorDoado;
     }
 
     public long getIdDoacao() {

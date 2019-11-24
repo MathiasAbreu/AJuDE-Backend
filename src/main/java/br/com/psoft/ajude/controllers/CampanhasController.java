@@ -203,8 +203,8 @@ public class CampanhasController {
         }
     }
 
-    /*@PostMapping("/addLike")
-    public ResponseEntity<Campanha> adicionarLike(@RequestHeader("Authorization") String header, @RequestBody String identificadorURL) {
+    @PostMapping("{identificadorURL}/addLike")
+    public ResponseEntity adicionarLike(@RequestHeader("Authorization") String header, @PathVariable String identificadorURL) {
 
         try {
 
@@ -216,10 +216,50 @@ public class CampanhasController {
             throw new UserNotFoundException();
         } catch(UserException err) {
 
-            return new ResponseEntity<Campanha>(new Campanha(),HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(err.getMessage(),HttpStatus.UNAUTHORIZED);
         } catch (CampaignException err) {
 
-            return new ResponseEntity<Campanha>(new Campanha(), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(err.getMessage(), HttpStatus.NOT_FOUND);
         }
-    }*/
+    }
+
+    @DeleteMapping("{identificadorURL/delLike")
+    public ResponseEntity removerLike(@RequestHeader("Authorization") String header, @PathVariable String identificadorURL) {
+
+        try {
+
+            if(jwtService.usuarioExiste(header)) {
+
+                return new ResponseEntity<Campanha>(campanhasService.deletaLike(jwtService.getUsuarioDoToken(header), identificadorURL), HttpStatus.OK);
+            }
+
+            throw new UserNotFoundException();
+        } catch (UserException err) {
+
+            return new ResponseEntity<>(err.getMessage(), HttpStatus.UNAUTHORIZED);
+        } catch (CampaignException err) {
+
+            return new ResponseEntity<>(err.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
+        }
+    }
+
+    @PostMapping("{identificadorURL/doacao")
+    public ResponseEntity realizarDoacao(@RequestHeader("Authorization") String header, @PathVariable String identificadorURL, @RequestBody Double doacao) {
+
+        try {
+
+            if(jwtService.usuarioExiste(header)) {
+
+                return new ResponseEntity<Double>(campanhasService.realizarDoacao(jwtService.getUsuarioDoToken(header), identificadorURL, doacao), HttpStatus.CREATED);
+            }
+
+            throw new UserNotFoundException();
+        } catch (UserException err) {
+
+            return new ResponseEntity<>(err.getMessage(), HttpStatus.UNAUTHORIZED);
+        } catch (CampaignException err) {
+
+            return new ResponseEntity<>(err.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
+        }
+    }
 }
