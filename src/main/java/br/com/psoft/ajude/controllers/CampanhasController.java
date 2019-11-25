@@ -172,7 +172,7 @@ public class CampanhasController {
             @ApiResponse(code = 406, message = "Os paramêtros recebidos para adicionar um novo comentário estão incompletos ou inválidos!")
     })
     @RequestMapping(value = "{identificadorURL}/addComentario", method = RequestMethod.POST, produces = "application/json", consumes = "application/json")
-    public ResponseEntity adicionarComentario(@RequestHeader("Authorization") String header, @PathVariable String identificadorURL, @RequestBody List<String> parametros) {
+    public ResponseEntity adicionarComentario(@ApiParam("Token válido de usuário.") @RequestHeader("Authorization") String header,@ApiParam("Identificador URL da campanha.") @PathVariable String identificadorURL,@ApiParam("Listagem de paramêtros para o comentário/resposta.") @RequestBody List<String> parametros) {
 
         try {
 
@@ -194,14 +194,21 @@ public class CampanhasController {
         }
     }
 
-    @DeleteMapping("{identificadorURL}/delComentario")
-    public ResponseEntity deletarComentario(@RequestHeader("Authorization") String header, @PathVariable String identificadorURL, @RequestBody String idComentario) {
+    @ApiOperation(value = "Deleta um comentário em uma campanha.", notes = "Remoção de comentário em Campanha Válida.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Retorna status de sucesso confirmando o êxito da operação."),
+            @ApiResponse(code = 401, message = "O token de usuário recebido não é válido ou o usuário não tem permissão para acesso a tal funcionalidade."),
+            @ApiResponse(code = 404, message = "A campanha não foi encontrada!"),
+    })
+    @RequestMapping(value = "{identificadorURL}/delComentario", method = RequestMethod.DELETE, produces = "application/json", consumes = "application/json")
+    public ResponseEntity deletarComentario(@ApiParam("Token válido de usuário.") @RequestHeader("Authorization") String header,@ApiParam("Identificador URL da campanha.") @PathVariable String identificadorURL, @ApiParam("Id do comentário a ser deletado.") @RequestBody String idComentario) {
 
         try {
 
             if (jwtService.usuarioExiste(header)) {
 
-                return new ResponseEntity<>(campanhasService.deletarComentario(jwtService.getUsuarioDoToken(header), identificadorURL, idComentario), HttpStatus.OK);
+                campanhasService.deletarComentario(jwtService.getUsuarioDoToken(header), identificadorURL, idComentario);
+                return new ResponseEntity<>(HttpStatus.OK);
             }
 
             throw new UserNotFoundException();
@@ -215,8 +222,14 @@ public class CampanhasController {
         }
     }
 
-    @PostMapping("{identificadorURL}/addLike")
-    public ResponseEntity adicionarLike(@RequestHeader("Authorization") String header, @PathVariable String identificadorURL) {
+    @ApiOperation(value = "Adiciona um like em uma campanha.", notes = "Adição de Like em Campanha Válida.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Retorna status de sucesso confirmando o êxito da operação."),
+            @ApiResponse(code = 401, message = "O token de usuário recebido não é válido ou o usuário não tem permissão para acesso a tal funcionalidade."),
+            @ApiResponse(code = 404, message = "A campanha não foi encontrada!"),
+    })
+    @RequestMapping(value = "{identificadorURL}/addLike", method = RequestMethod.POST, produces = "application/json", consumes = "application/json")
+    public ResponseEntity<Campanha> adicionarLike(@ApiParam("Token do Usuário que deu o like.") @RequestHeader("Authorization") String header,@ApiParam("Campanha alvo do Like.") @PathVariable String identificadorURL) {
 
         try {
 
@@ -228,15 +241,21 @@ public class CampanhasController {
             throw new UserNotFoundException();
         } catch(UserException err) {
 
-            return new ResponseEntity<>(err.getMessage(),HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(new Campanha(),HttpStatus.UNAUTHORIZED);
         } catch (CampaignException err) {
 
-            return new ResponseEntity<>(err.getMessage(), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new Campanha(), HttpStatus.NOT_FOUND);
         }
     }
 
-    @DeleteMapping("{identificadorURL}/delLike")
-    public ResponseEntity removerLike(@RequestHeader("Authorization") String header, @PathVariable String identificadorURL) {
+    @ApiOperation(value = "Deleta um like em uma campanha.", notes = "Remoção de Like em Campanha Válida.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Retorna status de sucesso confirmando o êxito da operação."),
+            @ApiResponse(code = 401, message = "O token de usuário recebido não é válido ou o usuário não tem permissão para acesso a tal funcionalidade."),
+            @ApiResponse(code = 404, message = "A campanha não foi encontrada!"),
+    })
+    @RequestMapping(value = "{identificadorURL}/delLike", method = RequestMethod.DELETE, produces = "application/json", consumes = "application/json")
+    public ResponseEntity removerLike(@ApiParam("Token do Usuário que está desfazendo o like.") @RequestHeader("Authorization") String header,@ApiParam("Identificador da campanha que vai perder o like.") @PathVariable String identificadorURL) {
 
         try {
 
@@ -255,8 +274,14 @@ public class CampanhasController {
         }
     }
 
-    @PostMapping("{identificadorURL}/doacao")
-    public ResponseEntity realizarDoacao(@RequestHeader("Authorization") String header, @PathVariable String identificadorURL, @RequestBody Double doacao) {
+    @ApiOperation(value = "Realiza uma doação para uma campanha especifica.", notes = "Adição de uma Doação em Campanha Válida.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Retorna status de sucesso confirmando o êxito da operação."),
+            @ApiResponse(code = 401, message = "O token de usuário recebido não é válido ou o usuário não tem permissão para acesso a tal funcionalidade."),
+            @ApiResponse(code = 404, message = "A campanha não foi encontrada!"),
+    })
+    @RequestMapping(value = "{identificadorURL}/doacao", method = RequestMethod.POST, produces = "application/json", consumes = "application/json")
+    public ResponseEntity realizarDoacao(@ApiParam("Token do Usuário que está fazendo a doação.") @RequestHeader("Authorization") String header,@ApiParam("Campanha alvo da doação.") @PathVariable String identificadorURL,@ApiParam("Valor da doação.") @RequestBody Double doacao) {
 
         try {
 
@@ -271,7 +296,7 @@ public class CampanhasController {
             return new ResponseEntity<>(err.getMessage(), HttpStatus.UNAUTHORIZED);
         } catch (CampaignException err) {
 
-            return new ResponseEntity<>(err.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
+            return new ResponseEntity<>(err.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
 }
