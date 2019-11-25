@@ -120,24 +120,12 @@ public class Campanha {
         this.usuario = usuario;
     }
 
-    public List<Comentario> getComentarios() {
-        return comentarios;
-    }
-
     public void setComentarios(List<Comentario> comentarios) {
         this.comentarios = comentarios;
     }
 
-    public List<Curtida> getCurtidas() {
-        return curtidas;
-    }
-
     public void setCurtidas(List<Curtida> curtidas) {
         this.curtidas = curtidas;
-    }
-
-    public List<Doacao> getDoacoes() {
-        return doacoes;
     }
 
     public void setDoacoes(List<Doacao> doacoes) {
@@ -202,8 +190,16 @@ public class Campanha {
         return curtidas.size();
     }
 
-    @Override
-    public String toString() {
-        return String.format("Campanha:\n ID: %d\n Nome: %s\n Descrição: %s\n Identificador URL: %s\n Data final: %s\n Meta: %.2f\n",id,nome,descricao,identificadorURL,dataDeadline,meta) + "[" + usuario.toString() + "]";
+    public List<Comentario> getComentarios() {
+        return comentarios;
     }
+
+    public List<Curtida> getCurtidas() {
+        return curtidas;
+    }
+
+    public List<Doacao> getDoacoes() {
+        return doacoes;
+    }
+
 }

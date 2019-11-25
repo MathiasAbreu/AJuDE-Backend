@@ -4,12 +4,14 @@ import br.com.psoft.ajude.entities.Usuario;
 import br.com.psoft.ajude.exceptions.UserAlreadyExistException;
 import br.com.psoft.ajude.services.JWTService;
 import br.com.psoft.ajude.services.UsuariosService;
+import io.swagger.annotations.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
+@Api(value = "Controle de Usuários da API")
 @RestController
 @RequestMapping("usuarios")
 public class UsuariosController {
@@ -24,8 +26,13 @@ public class UsuariosController {
         this.jwtService = jwtService;
     }
 
-    @PostMapping("/adiciona")
-    public ResponseEntity<String> adicionaUsuario(@RequestBody Usuario usuario) {
+    @ApiOperation(value = "Adiciona um novo usuário ao sistema.", notes = "Adição Válida")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Retorna uma mensagem de boas vindas confirmando o êxito da operação."),
+            @ApiResponse(code = 409, message = "Não foi possivel adicionar o novo usuário pois o email dele já está cadastrado sistema."),
+    })
+    @RequestMapping(value = "/adiciona", method = RequestMethod.POST, produces = "application/json", consumes = "application/json")
+    public ResponseEntity<String> adicionaUsuario(@ApiParam(value = "Novo Usuário.") @RequestBody Usuario usuario) {
 
         try {
 
@@ -34,16 +41,21 @@ public class UsuariosController {
 
         } catch (UserAlreadyExistException uaee) {
 
-            return new ResponseEntity<String>(uaee.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<String>(uaee.getMessage(), HttpStatus.CONFLICT);
         }
     }
 
-    @GetMapping("/busca")
-    public ResponseEntity<Usuario> buscaUsuario(@RequestBody Usuario usuario) {
+    @ApiOperation(value = "Busca um usuário no banco de dados do sistema.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Retorna com sucesso que o usuario foi encontrado e retornado sem eventuais problemas."),
+            @ApiResponse(code = 404, message = "Não foi possível encontrar o usuário na base de dados.")
+    })
+    @RequestMapping(value = "/busca", method = RequestMethod.GET, produces = "application/json", consumes = "application/json")
+    public ResponseEntity<Usuario> buscaUsuario(@ApiParam(value = "Email do Usuário.") @RequestBody Usuario usuario) {
 
         Optional<Usuario> retornoUsuario = usuariosService.getUsuario(usuario.getEmail());
         if(retornoUsuario.isPresent())
             return new ResponseEntity<Usuario>(retornoUsuario.get(),HttpStatus.OK);
-        return new ResponseEntity<Usuario>(new Usuario(null, null, null, 0, null),HttpStatus.NOT_FOUND);
+        return new ResponseEntity<Usuario>(new Usuario(),HttpStatus.NOT_FOUND);
     }
 }

@@ -8,13 +8,15 @@ import br.com.psoft.ajude.services.JWTService;
 import br.com.psoft.ajude.services.UsuariosService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import io.swagger.annotations.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.Optional;
 
+@Api(value = "Controle de Login dos Usuários")
 @RestController
 public class LoginController {
 
@@ -30,19 +32,30 @@ public class LoginController {
         this.jwtService = jwtService;
     }
 
-    @PostMapping("usuarios/login")
-    public LoginResponse authenticate(@RequestBody Usuario usuario) throws UserException {
+    @ApiOperation(value = "Realiza a autenticação de um usuário no sistema. Retornando um token se o usuário for válido.", notes = "Autenticação de Usuário. Atributos obrigatórios: Apenas email e senha do usuário!")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Usuário verificado. Token retornado."),
+            @ApiResponse(code = 404, message = "Usuário não encontrado!")
+    })
+    @RequestMapping(value = "usuarios/login", method = RequestMethod.POST, produces = "application/json", consumes = "application/json")
+    public ResponseEntity<LoginResponse> authenticate(@ApiParam(value = "Usuário a ser autenticado.") @RequestBody Usuario usuario) throws UserException {
 
         Optional<Usuario> authUsuario = usuariosService.getUsuario(usuario.getEmail());
 
-        if(!authUsuario.isPresent())
-            throw new UserNotFoundException(authUsuario.get().getEmail());
+        try {
 
-        if(!authUsuario.get().getSenha().equals(usuario.getSenha()))
-            throw new UserPasswordIncorrectException();
+            if (!authUsuario.isPresent())
+                throw new UserNotFoundException(authUsuario.get().getEmail());
 
-        String token = Jwts.builder().setSubject(authUsuario.get().getEmail()).signWith(SignatureAlgorithm.HS512,TOKEN_KEY).setExpiration(new Date(System.currentTimeMillis() + 3600 * 10000)).compact();
-        return new LoginResponse(token);
+            if (!authUsuario.get().getSenha().equals(usuario.getSenha()))
+                throw new UserPasswordIncorrectException();
+
+            String token = Jwts.builder().setSubject(authUsuario.get().getEmail()).signWith(SignatureAlgorithm.HS512, TOKEN_KEY).setExpiration(new Date(System.currentTimeMillis() + 3600 * 1000)).compact();
+            return new ResponseEntity<>(new LoginResponse(token), HttpStatus.OK);
+        } catch (UserException err) {
+
+            return new ResponseEntity<>(new LoginResponse("Usuário não encontrado!"), HttpStatus.NOT_FOUND);
+        }
     }
 
     private class LoginResponse {

@@ -42,66 +42,33 @@ public class CampanhasService {
         throw new CampaignNotFoundException(identificadorURL);
     }
 
-    public Campanha atualizaDescricaoCampanha(String usuario, String identificadorURL, String novaDescricao) throws CampaignException, UserException {
+    public void atualizaDescricaoCampanha(String usuario, String identificadorURL, String novaDescricao) throws CampaignException, UserException {
 
         Campanha campanha = buscaCampanha(identificadorURL);
 
         if(campanha.getUsuario().getEmail().equals(usuario)) {
-
-            return (campanhasDao.findById(campanha.getId()).map(record -> {
+            campanhasDao.findById(campanha.getId()).map(record -> {
 
                 System.out.println(novaDescricao);
                 record.setDescricao(novaDescricao);
                 return campanhasDao.save(record);
-            })).get();
+            });
         }
 
         throw new UserNotAuthorizedForProcedure();
     }
 
-    public Campanha atualizaStatusCampanha(String usuario, String identificadorURL, String novoStatus) throws CampaignException, UserException {
+    public void atualizaStatusCampanha(String usuario, String identificadorURL, String novoStatus) throws CampaignException, UserException {
 
         Campanha campanha = buscaCampanha(identificadorURL);
 
         if(campanha.getUsuario().getEmail().equals(usuario)) {
 
-            return (campanhasDao.findById(campanha.getId()).map(record -> {
+            campanhasDao.findById(campanha.getId()).map(record -> {
 
                 record.setStatus(novoStatus);
                 return campanhasDao.save(record);
-            })).get();
-        }
-
-        throw new UserNotAuthorizedForProcedure();
-    }
-
-    public Campanha atualizaMetaCampanha(String usuario, String identificadorURL, double novaMeta) throws CampaignException, UserException {
-
-        Campanha campanha = buscaCampanha(identificadorURL);
-
-        if(campanha.getUsuario().getEmail().equals(usuario)) {
-
-            return (campanhasDao.findById(campanha.getId()).map(record -> {
-
-                record.setMeta(novaMeta);
-                return campanhasDao.save(record);
-            })).get();
-        }
-
-        throw new UserNotAuthorizedForProcedure();
-    }
-
-    public Campanha atualizaDataCampanha(String usuario, String identificadorURL, String novaData) throws CampaignException, UserException {
-
-        Campanha campanha = buscaCampanha(identificadorURL);
-
-        if(campanha.getUsuario().getEmail().equals(usuario)) {
-
-            return (campanhasDao.findById(campanha.getId()).map(record -> {
-
-                record.setDataDeadline(novaData);
-                return campanhasDao.save(record);
-            })).get();
+            });
         }
 
         throw new UserNotAuthorizedForProcedure();
@@ -319,12 +286,17 @@ public class CampanhasService {
 
         Comparator<Campanha> comparator = escolheCriterio(parametroOrdenacao);
 
-        List<Campanha> campanhas = campanhasDao.findAll();
+        List<Campanha> todasCampanhas = campanhasDao.findAll();
 
-        if(campanhas.size() > 0)
-            campanhas.sort(comparator);
+        if(todasCampanhas.size() > 0)
+            todasCampanhas.sort(comparator);
 
-        return campanhas;
+        List<Campanha> retornoCampanhas = new ArrayList<>();
+        for(int i = 0; i < 5 && i < todasCampanhas.size(); i++) {
+            retornoCampanhas.add(todasCampanhas.get(i));
+        }
+
+        return retornoCampanhas;
     }
 
     private Comparator<Campanha> escolheCriterio(String parametroOrdenacao) {
