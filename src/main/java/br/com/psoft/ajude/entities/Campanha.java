@@ -2,6 +2,7 @@ package br.com.psoft.ajude.entities;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.*;
 import java.util.*;
@@ -10,29 +11,42 @@ import java.util.*;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Campanha {
 
+    @ApiModelProperty(value = "Identificador de uma campanha")
     @Id @GeneratedValue
     private long id;
 
+    @ApiModelProperty(value = "Nome de uma campanha")
     private String nome;
+
+    @ApiModelProperty(value = "Descrição de Uma campanha")
     private String descricao;
+
+    @ApiModelProperty(value = "Identificador URL único de uma campanha")
     private String identificadorURL;
 
+    @ApiModelProperty(value = "Data para o fim de uma campanha")
     private String dataDeadline;
 
+    @ApiModelProperty(value = "Status de uma campanha")
     private String status;
 
+    @ApiModelProperty(value = "Meta de uma camapanha")
     private double meta;
 
+    @ApiModelProperty(value = "Usuario dono da campanha")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "email")
     private Usuario usuario;
 
+    @ApiModelProperty(value = "Comentarios feitos na campanha")
     @OneToMany(mappedBy = "campanha", fetch = FetchType.LAZY)
     private List<Comentario> comentarios = new ArrayList<>();
 
+    @ApiModelProperty(value = "Doacoes feitas na campanha")
     @OneToMany(mappedBy = "campanhaAlvo", fetch = FetchType.LAZY)
     private List<Doacao> doacoes = new ArrayList<>();
 
+    @ApiModelProperty(value = "Likes dados para a campanha")
     @OneToMany(mappedBy = "campanhaCurtida", fetch = FetchType.LAZY)
     private List<Curtida> curtidas = new ArrayList<>();
 
@@ -168,6 +182,7 @@ public class Campanha {
             if(curtida.getUsuarioQCurtiu().getEmail().equals(emailUsuario)) {
 
                 curtidas.remove(curtida);
+                return;
             }
         }
     }

@@ -16,7 +16,7 @@ public class EmailService extends HttpServlet {
     public static void service(Usuario usuario) {
 
         final String sendgridApiKey = "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";
-        final String sendgridSender = "Ajude";
+        final String sendgridSender = "ajude@application.com.br";
 
         final String toEmail = usuario.getEmail();
 

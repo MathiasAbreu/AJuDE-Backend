@@ -1,5 +1,6 @@
 package br.com.psoft.ajude.controllers;
 
+import br.com.psoft.ajude.entities.Campanha;
 import br.com.psoft.ajude.entities.Usuario;
 import br.com.psoft.ajude.exceptions.UserAlreadyExistException;
 import br.com.psoft.ajude.exceptions.UserException;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @Api(value = "Controle de Usuários da API")
@@ -57,9 +59,9 @@ public class UsuariosController {
     public ResponseEntity<Usuario> buscaUsuario(@ApiParam(value = "Email do Usuário.") @RequestBody Usuario usuario) {
 
         Optional<Usuario> retornoUsuario = usuariosService.getUsuario(usuario.getEmail());
-        if(retornoUsuario.isPresent())
-            return new ResponseEntity<Usuario>(retornoUsuario.get(),HttpStatus.OK);
+        if (retornoUsuario.isPresent())
+            return new ResponseEntity<Usuario>(retornoUsuario.get(), HttpStatus.OK);
 
-        return new ResponseEntity<Usuario>(new Usuario(),HttpStatus.NOT_FOUND);
+        return new ResponseEntity<Usuario>(new Usuario(), HttpStatus.NOT_FOUND);
     }
 }

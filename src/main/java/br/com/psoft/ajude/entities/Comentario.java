@@ -51,6 +51,15 @@ public class Comentario {
         this.status = true;
     }
 
+    public Comentario(String conteudo, Campanha campanha, Usuario usuarioQComentou, long idResposta) {
+
+        this.conteudo = conteudo;
+        this.campanha = campanha;
+        this.usuarioQComentou = usuarioQComentou;
+        this.status = true;
+        this.idResposta = idResposta;
+    }
+
     public long getIdComentario() {
         return idComentario;
     }

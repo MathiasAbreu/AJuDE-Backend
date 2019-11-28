@@ -45,12 +45,12 @@ public class LoginController {
         try {
 
             if (!authUsuario.isPresent())
-                throw new UserNotFoundException(authUsuario.get().getEmail());
+                throw new UserNotFoundException();
 
             if (!authUsuario.get().getSenha().equals(usuario.getSenha()))
                 throw new UserPasswordIncorrectException();
 
-            String token = Jwts.builder().setSubject(authUsuario.get().getEmail()).signWith(SignatureAlgorithm.HS512, TOKEN_KEY).setExpiration(new Date(System.currentTimeMillis() + 3600 * 1000)).compact();
+            String token = Jwts.builder().setSubject(authUsuario.get().getEmail()).signWith(SignatureAlgorithm.HS512, TOKEN_KEY).setExpiration(new Date(System.currentTimeMillis() + 21600 * 1000)).compact();
             return new ResponseEntity<>(new LoginResponse(token), HttpStatus.OK);
         } catch (UserException err) {
 

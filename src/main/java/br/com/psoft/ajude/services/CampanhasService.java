@@ -90,20 +90,22 @@ public class CampanhasService {
         Optional<Usuario> user = usuariosDao.findById(emailUser);
         if(user.isPresent()) {
 
-            campanha.setUsuario(adicionaCampanhaNoUsuario(user.get(),campanha));
+            campanha.setUsuario(user.get());
+            campanha = campanhasDao.save(campanha);
+            adicionaCampanhaNoUsuario(user.get(), campanha);
             return campanhasDao.save(campanha);
         }
 
         throw new UserNotFoundException();
     }
 
-    private Usuario adicionaCampanhaNoUsuario(Usuario usuario, Campanha campanha) {
+    private void adicionaCampanhaNoUsuario(Usuario usuario, Campanha campanha) {
 
-        return (usuariosDao.findById(usuario.getEmail()).map(record -> {
+        usuariosDao.findById(usuario.getEmail()).map(record -> {
 
             record.adicionaCampanha(campanha);
             return usuariosDao.save(record);
-        })).get();
+        });
     }
 
     public List<Campanha> buscarCampanhaPorSubstring(String substring) {
@@ -139,18 +141,6 @@ public class CampanhasService {
         return (campanhasDao.findById(campanha.getId()).map(record -> {
 
             record.adicionaComentario(comentario);
-            comentariosRepository.save(comentario);
-            return campanhasDao.save(record);
-        })).get();
-    }
-
-    private Campanha addResposta(Campanha campanha, Comentario comentario, Long idComentario) {
-
-        return (campanhasDao.findById(campanha.getId()).map(record -> {
-
-            comentario.setIdResposta(idComentario);
-            record.adicionaComentario(comentario);
-            comentariosRepository.save(comentario);
             return campanhasDao.save(record);
         })).get();
     }
@@ -165,15 +155,13 @@ public class CampanhasService {
 
         Campanha campanha = buscaCampanha(identificadorURL);
 
-        Comentario comentario = new Comentario(parametros.get(1),campanha,user.get());
-
-        if(parametros.get(0).equals("comentario"))
-            return addComentario(campanha,comentario);
-
+        Comentario comentario;
         if(parametros.get(0).equals("resposta"))
-            return addResposta(campanha,comentario,Long.parseLong(parametros.get(2)));
+            comentario = comentariosRepository.save(new Comentario(parametros.get(1),campanha,user.get(),Long.parseLong(parametros.get(2))));
+        else
+            comentario = comentariosRepository.save(new Comentario(parametros.get(1),campanha,user.get()));
 
-        throw new CommentParametersInsufficientException();
+        return addComentario(campanha,comentario);
     }
 
     public Campanha adicionaLike(String emailUser, String identificadorURL) throws CampaignException, UserNotFoundException {
@@ -184,12 +172,11 @@ public class CampanhasService {
         if(!usuario.isPresent())
             throw new UserNotFoundException();
 
-        Curtida curtida = new Curtida(campanha,usuario.get());
+        Curtida curtida = curtidasDao.save(new Curtida(campanha,usuario.get()));
 
         return (campanhasDao.findById(campanha.getId()).map(record -> {
 
             record.adicionaCurtida(curtida);
-            curtidasDao.save(curtida);
             return campanhasDao.save(record);
 
         })).get();
@@ -219,7 +206,7 @@ public class CampanhasService {
     }
 
     //idComentario
-    public Campanha deletarComentario(String emailUser, String identificadorURL, String idComentario) throws CampaignException, UserException {
+    public Campanha deletarComentario(String emailUser, String identificadorURL, Long idComentario) throws CampaignException, UserException {
 
         Campanha campanha = buscaCampanha(identificadorURL);
 
@@ -227,7 +214,7 @@ public class CampanhasService {
         for(int i = 0; i < comentarios.size(); i++) {
 
             Comentario comentario = comentarios.get(i);
-            if(comentario.getIdComentario() == Long.parseLong(idComentario)) {
+            if(comentario.getIdComentario() == idComentario) {
 
                 if(comentario.getUsuarioQComentou().getEmail().equals(emailUser))
                     throw new UserNotAuthorizedForProcedure();
@@ -294,14 +281,24 @@ public class CampanhasService {
         });
     }
 
-    public List<Campanha> retornaCampanhasDoUsuario(String emailUser) {
+    public List<Campanha> retornaCampanhasDoUsuario(String emailUser) throws UserException {
 
-        return usuariosDao.findById(emailUser).get().getCampanhas();
+        Optional<Usuario> usuario = usuariosDao.findById(emailUser);
+
+        if(!usuario.isPresent())
+            throw new UserNotFoundException();
+
+        return usuario.get().getCampanhas();
     }
 
-    public List<Campanha> retornaCampanhasContribuidas(String emailUser) {
+    public List<Campanha> retornaCampanhasContribuidas(String emailUser) throws UserException {
 
-        List<Doacao> doacoes = usuariosDao.findById(emailUser).get().getDoacoes();
+        Optional<Usuario> usuario = usuariosDao.findById(emailUser);
+
+        if(!usuario.isPresent())
+            throw new UserNotFoundException();
+
+        List<Doacao> doacoes = usuario.get().getDoacoes();
         List<Campanha> campanhas = new ArrayList<>();
 
         for(Doacao doacao : doacoes)

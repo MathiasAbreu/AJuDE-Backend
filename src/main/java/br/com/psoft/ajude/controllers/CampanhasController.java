@@ -1,6 +1,7 @@
 package br.com.psoft.ajude.controllers;
 
 import br.com.psoft.ajude.entities.Campanha;
+import br.com.psoft.ajude.entities.Usuario;
 import br.com.psoft.ajude.exceptions.*;
 import br.com.psoft.ajude.services.CampanhasService;
 import br.com.psoft.ajude.services.JWTService;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Api(value = "Controle de Campanhas da API")
 @RestController
@@ -60,7 +62,7 @@ public class CampanhasController {
             @ApiResponse(code = 401, message = "O token de usuário recebido não é válido ou o usuário não tem permissão para acesso a tal funcionalidade."),
             @ApiResponse(code = 404, message = "A campanha não foi encontrada!")
     })
-    @RequestMapping(value = "{identificadorURL}/descricao", method = RequestMethod.PUT, produces = "application/json", consumes = "application/text")
+    @RequestMapping(value = "{identificadorURL}/descricao", method = RequestMethod.PUT, produces = "application/json", consumes = "application/json")
     public ResponseEntity<Campanha> atualizaDescricaoCampanha(@ApiParam("Token de autorização válido!") @RequestHeader("Authorization") String header,  @ApiParam("Identificador de URl único da campanha.") @PathVariable String identificadorURL, @ApiParam("Nova descrição da campanha.") @RequestBody String novaDescricao) {
 
         try {
@@ -87,24 +89,23 @@ public class CampanhasController {
             @ApiResponse(code = 401, message = "O token de usuário recebido não é válido ou o usuário não tem permissão para acesso a tal funcionalidade."),
             @ApiResponse(code = 404, message = "A campanha não foi encontrada!")
     })
-    @RequestMapping(value = "{identificadorURL}/status", method = RequestMethod.PUT, produces = "application/json", consumes = "application/text")
-    public ResponseEntity atualizaStatusCampanha(@RequestHeader("Authorization") String header, @PathVariable String identificadorURL, @RequestBody String novoStatus) {
+    @RequestMapping(value = "{identificadorURL}/status", method = RequestMethod.PUT, produces = "application/json", consumes = "application/json")
+    public ResponseEntity<Campanha> atualizaStatusCampanha(@RequestHeader("Authorization") String header, @PathVariable String identificadorURL, @RequestBody String novoStatus) {
 
         try {
 
             if(jwtService.usuarioExiste(header)) {
 
-                campanhasService.atualizaStatusCampanha(jwtService.getUsuarioDoToken(header),identificadorURL,novoStatus);
-                return new ResponseEntity<>(HttpStatus.OK);
+                return new ResponseEntity<>(campanhasService.atualizaStatusCampanha(jwtService.getUsuarioDoToken(header),identificadorURL,novoStatus),HttpStatus.OK);
             }
 
             throw new UserNotFoundException();
         } catch (UserException err) {
 
-            return new ResponseEntity<>(err.getMessage(),HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(new Campanha(),HttpStatus.UNAUTHORIZED);
         } catch (CampaignException err) {
 
-            return new ResponseEntity<>(err.getMessage(),HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new Campanha(),HttpStatus.NOT_FOUND);
         }
     }
 
@@ -113,7 +114,7 @@ public class CampanhasController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Retorna status de sucesso confirmando o êxito da operação."),
     })
-    @RequestMapping(value = "/buscaTotal", method = RequestMethod.GET, produces = "application/json", consumes = "application/text")
+    @RequestMapping(value = "/buscaTotal", method = RequestMethod.GET, produces = "application/json", consumes = "application/json")
     public ResponseEntity<List<Campanha>> retornarCampanhas(@ApiParam("Critério de ordenação.") @RequestBody String parametroOrdenacao) {
 
         return new ResponseEntity<List<Campanha>>(campanhasService.retornarCampanhasOrdenadas(parametroOrdenacao), HttpStatus.OK);
@@ -209,8 +210,8 @@ public class CampanhasController {
             @ApiResponse(code = 401, message = "O token de usuário recebido não é válido ou o usuário não tem permissão para acesso a tal funcionalidade."),
             @ApiResponse(code = 404, message = "A campanha não foi encontrada!"),
     })
-    @RequestMapping(value = "{identificadorURL}/delComentario", method = RequestMethod.DELETE, produces = "application/json", consumes = "application/text")
-    public ResponseEntity<Campanha> deletarComentario(@ApiParam("Token válido de usuário.") @RequestHeader("Authorization") String header,@ApiParam("Identificador URL da campanha.") @PathVariable String identificadorURL, @ApiParam("Id do comentário a ser deletado.") @RequestBody String idComentario) {
+    @RequestMapping(value = "{identificadorURL}/delComentario", method = RequestMethod.DELETE, produces = "application/json", consumes = "application/json")
+    public ResponseEntity<Campanha> deletarComentario(@ApiParam("Token válido de usuário.") @RequestHeader("Authorization") String header,@ApiParam("Identificador URL da campanha.") @PathVariable String identificadorURL, @ApiParam("Id do comentário a ser deletado.") @RequestBody Long idComentario) {
 
         try {
 
@@ -237,7 +238,7 @@ public class CampanhasController {
             @ApiResponse(code = 401, message = "O token de usuário recebido não é válido ou o usuário não tem permissão para acesso a tal funcionalidade."),
             @ApiResponse(code = 404, message = "A campanha não foi encontrada!"),
     })
-    @RequestMapping(value = "{identificadorURL}/addLike", method = RequestMethod.POST, produces = "application/json", consumes = "application/json")
+    @RequestMapping(value = "{identificadorURL}/addLike", method = RequestMethod.POST, produces = "application/json")
     public ResponseEntity<Campanha> adicionarLike(@ApiParam("Token do Usuário que deu o like.") @RequestHeader("Authorization") String header,@ApiParam("Campanha alvo do Like.") @PathVariable String identificadorURL) {
 
         try {
@@ -264,7 +265,7 @@ public class CampanhasController {
             @ApiResponse(code = 401, message = "O token de usuário recebido não é válido ou o usuário não tem permissão para acesso a tal funcionalidade."),
             @ApiResponse(code = 404, message = "A campanha não foi encontrada!"),
     })
-    @RequestMapping(value = "{identificadorURL}/delLike", method = RequestMethod.DELETE, produces = "application/json", consumes = "application/json")
+    @RequestMapping(value = "{identificadorURL}/delLike", method = RequestMethod.DELETE, produces = "application/json")
     public ResponseEntity removerLike(@ApiParam("Token do Usuário que está desfazendo o like.") @RequestHeader("Authorization") String header,@ApiParam("Identificador da campanha que vai perder o like.") @PathVariable String identificadorURL) {
 
         try {
@@ -292,7 +293,7 @@ public class CampanhasController {
             @ApiResponse(code = 404, message = "A campanha não foi encontrada!"),
     })
     @RequestMapping(value = "{identificadorURL}/doacao", method = RequestMethod.POST, produces = "application/json", consumes = "application/json")
-    public ResponseEntity<Campanha> realizarDoacao(@ApiParam("Token do Usuário que está fazendo a doação.") @RequestHeader("Authorization") String header,@ApiParam("Campanha alvo da doação.") @PathVariable String identificadorURL,@ApiParam("Valor da doação.") @RequestBody Double doacao) {
+    public ResponseEntity<Campanha> realizarDoacao(@ApiParam("Token do Usuário que está fazendo a doação.") @RequestHeader("Authorization") String header,@ApiParam("Campanha alvo da doação.") @PathVariable String identificadorURL, @ApiParam("Valor da doação.") @RequestBody Double doacao) {
 
         try {
 
@@ -308,6 +309,43 @@ public class CampanhasController {
         } catch (CampaignException err) {
 
             return new ResponseEntity<>(new Campanha(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @ApiOperation(value = "Busca todas as campanhas criadas por um Usuário", notes = "Busca de Campanhas Criadas por um único Usuário. Não é necessário que o usuário esteja autenticado para acessar tal funcionalidade. A funcionalidade está mapeada pelo email do Usuário. " +
+            " Retorna uma lista com as campanhas que o usuário criou. Caso o usuário em questão não esteja disponivel no banco de dados, uma lista vazia é retornada.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Retorna status de sucesso confirmando o êxito da operação."),
+            @ApiResponse(code = 404, message = "O usuario não foi encontrado."),
+    })
+    @RequestMapping(value = "{emailUser}/campanhas", method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<List<Campanha>> buscaCampanhasDoUsuario(@ApiParam(value = "Email do Usuário.") @PathVariable String emailUser) {
+
+        try {
+
+            return new ResponseEntity<>(campanhasService.retornaCampanhasDoUsuario(emailUser),HttpStatus.OK);
+
+        } catch (UserException err) {
+
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @ApiOperation(value = "Busca todas as campanhas que receberam doações de um Usuário", notes = "Busca de Campanhas alvos de doações por um Usuário. Não é necessário que o usuário esteja autenticado para acessar tal funcionalidade. A funcionalidade está mapeada pelo email do Usuário. " +
+            " Retorna uma lista com as campanhas. Caso o usuário em questão não esteja disponivel no banco de dados, uma lista vazia é retornada.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Retorna status de sucesso confirmando o êxito da operação."),
+            @ApiResponse(code = 404, message = "O usuario não foi encontrado."),
+    })
+    @RequestMapping(value = "{emailUser}/campDoacoes", method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<List<Campanha>> buscaCampanhasContribuidas(@ApiParam(value = "Email do Usuário.") @PathVariable String emailUser) {
+
+        try {
+
+            return new ResponseEntity<>(campanhasService.retornaCampanhasContribuidas(emailUser), HttpStatus.OK);
+        } catch (UserException err) {
+
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.NOT_FOUND);
         }
     }
 }
