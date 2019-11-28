@@ -190,6 +190,23 @@ public class Campanha {
         return curtidas.size();
     }
 
+    public boolean verificaVencimento() {
+
+        Date date = new Date(System.currentTimeMillis());
+        String data = String.format("%d/%d/%d",date.getDay(),date.getMonth() + 1,date.getYear());
+
+        if(data.compareTo(dataDeadline) == 1) {
+
+            if(valorRestante() == 0)
+                this.status = "Concluida";
+            else
+                this.status = "Vencida";
+
+            return true;
+        }
+        return false;
+    }
+
     public List<Comentario> getComentarios() {
         return comentarios;
     }

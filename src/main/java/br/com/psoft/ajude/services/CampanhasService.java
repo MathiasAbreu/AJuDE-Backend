@@ -35,8 +35,19 @@ public class CampanhasService {
 
         for(Campanha campanha: campanhas) {
 
-            if(campanha.getIdentificadorURL().equals(identificadorURL))
+            if(campanha.getIdentificadorURL().equals(identificadorURL)) {
+
+                if(campanha.verificaVencimento()) {
+
+                    return campanhasDao.findById(campanha.getId()).map(record -> {
+
+                        record.setStatus(campanha.getStatus());
+                        return campanhasDao.save(record);
+
+                    }).get();
+                }
                 return campanha;
+            }
         }
 
         throw new CampaignNotFoundException(identificadorURL);
@@ -208,7 +219,7 @@ public class CampanhasService {
     }
 
     //idComentario
-    public Campanha deletarComentario(String emailUser, String identificadorURL, String idComentario) throws CampaignNotFoundException {
+    public Campanha deletarComentario(String emailUser, String identificadorURL, String idComentario) throws CampaignException, UserException {
 
         Campanha campanha = buscaCampanha(identificadorURL);
 
@@ -216,7 +227,10 @@ public class CampanhasService {
         for(int i = 0; i < comentarios.size(); i++) {
 
             Comentario comentario = comentarios.get(i);
-            if(comentario.getIdComentario() == Long.parseLong(idComentario) && comentario.getUsuarioQComentou().getEmail().equals(emailUser)) {
+            if(comentario.getIdComentario() == Long.parseLong(idComentario)) {
+
+                if(comentario.getUsuarioQComentou().getEmail().equals(emailUser))
+                    throw new UserNotAuthorizedForProcedure();
 
                 campanha = (campanhasDao.findById(campanha.getId()).map(record -> {
 

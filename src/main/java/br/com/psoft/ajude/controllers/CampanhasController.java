@@ -172,7 +172,7 @@ public class CampanhasController {
             @ApiResponse(code = 406, message = "Os paramêtros recebidos para adicionar um novo comentário estão incompletos ou inválidos!")
     })
     @RequestMapping(value = "{identificadorURL}/addComentario", method = RequestMethod.POST, produces = "application/json", consumes = "application/json")
-    public ResponseEntity adicionarComentario(@ApiParam("Token válido de usuário.") @RequestHeader("Authorization") String header,@ApiParam("Identificador URL da campanha.") @PathVariable String identificadorURL,@ApiParam("Listagem de paramêtros para o comentário/resposta.") @RequestBody List<String> parametros) {
+    public ResponseEntity<Campanha> adicionarComentario(@ApiParam("Token válido de usuário.") @RequestHeader("Authorization") String header,@ApiParam("Identificador URL da campanha.") @PathVariable String identificadorURL,@ApiParam("Listagem de parâmetros para o comentário/resposta.") @RequestBody List<String> parametros) {
 
         try {
 
@@ -184,13 +184,13 @@ public class CampanhasController {
 
         } catch (UserException err) {
 
-            return new ResponseEntity<>(err.getMessage(), HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(new Campanha(), HttpStatus.UNAUTHORIZED);
         } catch (CampaignException err) {
 
-            return new ResponseEntity<>(err.getMessage(), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new Campanha(), HttpStatus.NOT_FOUND);
         } catch (CommentException err) {
 
-            return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(new Campanha(), HttpStatus.NOT_ACCEPTABLE);
         }
     }
 
@@ -201,24 +201,23 @@ public class CampanhasController {
             @ApiResponse(code = 404, message = "A campanha não foi encontrada!"),
     })
     @RequestMapping(value = "{identificadorURL}/delComentario", method = RequestMethod.DELETE, produces = "application/json", consumes = "application/json")
-    public ResponseEntity deletarComentario(@ApiParam("Token válido de usuário.") @RequestHeader("Authorization") String header,@ApiParam("Identificador URL da campanha.") @PathVariable String identificadorURL, @ApiParam("Id do comentário a ser deletado.") @RequestBody String idComentario) {
+    public ResponseEntity<Campanha> deletarComentario(@ApiParam("Token válido de usuário.") @RequestHeader("Authorization") String header,@ApiParam("Identificador URL da campanha.") @PathVariable String identificadorURL, @ApiParam("Id do comentário a ser deletado.") @RequestBody String idComentario) {
 
         try {
 
             if (jwtService.usuarioExiste(header)) {
 
-                campanhasService.deletarComentario(jwtService.getUsuarioDoToken(header), identificadorURL, idComentario);
-                return new ResponseEntity<>(HttpStatus.OK);
+                return new ResponseEntity<>(campanhasService.deletarComentario(jwtService.getUsuarioDoToken(header), identificadorURL, idComentario),HttpStatus.OK);
             }
 
             throw new UserNotFoundException();
         } catch (UserException err) {
 
-            return new ResponseEntity<>(err.getMessage(), HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(new Campanha(), HttpStatus.UNAUTHORIZED);
 
         } catch (CampaignException err) {
 
-            return new ResponseEntity<>(err.getMessage(),HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new Campanha(),HttpStatus.NOT_FOUND);
         }
     }
 

@@ -3,6 +3,7 @@ package br.com.psoft.ajude.services;
 import br.com.psoft.ajude.daos.UsuariosRepository;
 import br.com.psoft.ajude.entities.Usuario;
 import br.com.psoft.ajude.exceptions.UserAlreadyExistException;
+import br.com.psoft.ajude.exceptions.UserException;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -19,12 +20,12 @@ public class UsuariosService {
         this.usuariosDao = usuariosDao;
     }
 
-    public void adicionaUsuario(Usuario usuario) throws UserAlreadyExistException {
+    public void adicionaUsuario(Usuario usuario) throws UserException {
 
         Optional<Usuario> verificaUsuario = usuariosDao.findById(usuario.getEmail());
 
         if(!verificaUsuario.isPresent())
-            usuariosDao.save(usuario);
+            EmailService.service(usuariosDao.save(usuario));
         else
             throw new UserAlreadyExistException(usuario.getEmail());
     }
