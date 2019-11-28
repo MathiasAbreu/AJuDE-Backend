@@ -318,7 +318,7 @@ public class CampanhasController {
             @ApiResponse(code = 200, message = "Retorna status de sucesso confirmando o êxito da operação."),
             @ApiResponse(code = 404, message = "O usuario não foi encontrado."),
     })
-    @RequestMapping(value = "{emailUser}/campanhas", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/{emailUser}/", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<List<Campanha>> buscaCampanhasDoUsuario(@ApiParam(value = "Email do Usuário.") @PathVariable String emailUser) {
 
         try {
@@ -337,7 +337,7 @@ public class CampanhasController {
             @ApiResponse(code = 200, message = "Retorna status de sucesso confirmando o êxito da operação."),
             @ApiResponse(code = 404, message = "O usuario não foi encontrado."),
     })
-    @RequestMapping(value = "{emailUser}/campDoacoes", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/{emailUser}/campDoacoes", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<List<Campanha>> buscaCampanhasContribuidas(@ApiParam(value = "Email do Usuário.") @PathVariable String emailUser) {
 
         try {

@@ -206,7 +206,7 @@ public class CampanhasService {
     }
 
     //idComentario
-    public Campanha deletarComentario(String emailUser, String identificadorURL, Long idComentario) throws CampaignException, UserException {
+    public Campanha deletarComentario(String emailUser, String identificadorURL, long idComentario) throws CampaignException, UserException {
 
         Campanha campanha = buscaCampanha(identificadorURL);
 
@@ -216,7 +216,7 @@ public class CampanhasService {
             Comentario comentario = comentarios.get(i);
             if(comentario.getIdComentario() == idComentario) {
 
-                if(comentario.getUsuarioQComentou().getEmail().equals(emailUser))
+                if(!comentario.getUsuarioQComentou().getEmail().equals(emailUser))
                     throw new UserNotAuthorizedForProcedure();
 
                 campanha = (campanhasDao.findById(campanha.getId()).map(record -> {
@@ -326,10 +326,10 @@ public class CampanhasService {
 
     private Comparator<Campanha> escolheCriterio(String parametroOrdenacao) {
 
-        if(parametroOrdenacao.equals("data"))
+        if(parametroOrdenacao.equals("data") || parametroOrdenacao.contains("data"))
             return new ComparatorCampanhaPorData();
 
-        if(parametroOrdenacao.equals("likes"))
+        if(parametroOrdenacao.equals("likes") || parametroOrdenacao.contains("like"))
             return new ComparatorCampanhaPorLikes();
 
         return new ComparatorCampanhaPorMeta();
