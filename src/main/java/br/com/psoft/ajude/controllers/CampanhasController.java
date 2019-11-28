@@ -27,13 +27,14 @@ public class CampanhasController {
         this.campanhasService = campanhasService;
     }
 
-    @ApiOperation(value = "Busca uma campanha no sistema.", notes = "Busca de Campanha Válida.")
+    @ApiOperation(value = "Busca uma campanha no sistema.", notes = "Busca de Campanha Válida. Somente um Usuário autenticado pode acessar essa funcionalidade. A funcionalidade está mapeada com a URL de identificação única da campanha." +
+                          "Retorna a companha com todos os seus dados. Caso a campanha não seja encontrada, uma Campanha com valores nulos é retornada acompanhando status code de erro.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Retorna status de sucesso confirmando o êxito da operação."),
             @ApiResponse(code = 401, message = "O token recebido não é válido."),
             @ApiResponse(code = 404, message = "A campanha desejada não foi encontrada!")
     })
-    @RequestMapping(value = "{identificadorURL}/busca", method = RequestMethod.GET, produces = "application/json", consumes = "application/json")
+    @RequestMapping(value = "{identificadorURL}/busca", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<Campanha> buscaCampanha(@ApiParam("Token de autorização válido!") @RequestHeader("Authorization") String header, @ApiParam("Identificador de URl único da campanha.") @PathVariable String identificadorURL) {
 
         try {
@@ -52,34 +53,35 @@ public class CampanhasController {
         }
     }
 
-    @ApiOperation(value = "Permite que o dono atualize a descrição de uma campanha sua.", notes = "Atualização de Campanha Válida.")
+    @ApiOperation(value = "Permite que o dono atualize a descrição de uma campanha sua.", notes = "Atualização de Campanha Válida. Somente o Usuário dono da campanha, com um token válido, tem acesso a essa funcionalidade." +
+                          "A funcionalidade está mapeada com a URL de identificação única da campanha, e recebe como parâmetro, a nova descrição da campanha, no formato 'application/text'.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Retorna status de sucesso confirmando o êxito da operação."),
             @ApiResponse(code = 401, message = "O token de usuário recebido não é válido ou o usuário não tem permissão para acesso a tal funcionalidade."),
             @ApiResponse(code = 404, message = "A campanha não foi encontrada!")
     })
     @RequestMapping(value = "{identificadorURL}/descricao", method = RequestMethod.PUT, produces = "application/json", consumes = "application/text")
-    public ResponseEntity atualizaDescricaoCampanha(@ApiParam("Token de autorização válido!") @RequestHeader("Authorization") String header,  @ApiParam("Identificador de URl único da campanha.") @PathVariable String identificadorURL, @ApiParam("Nova descrição da campanha.") @RequestBody String novaDescricao) {
+    public ResponseEntity<Campanha> atualizaDescricaoCampanha(@ApiParam("Token de autorização válido!") @RequestHeader("Authorization") String header,  @ApiParam("Identificador de URl único da campanha.") @PathVariable String identificadorURL, @ApiParam("Nova descrição da campanha.") @RequestBody String novaDescricao) {
 
         try {
 
             if(jwtService.usuarioExiste(header)) {
 
-                campanhasService.atualizaDescricaoCampanha(jwtService.getUsuarioDoToken(header),identificadorURL,novaDescricao);
-                return new ResponseEntity<>(HttpStatus.OK);
+                return new ResponseEntity<Campanha>(campanhasService.atualizaDescricaoCampanha(jwtService.getUsuarioDoToken(header),identificadorURL,novaDescricao),HttpStatus.OK);
             }
 
             throw new UserNotFoundException();
         } catch (UserException err) {
 
-            return new ResponseEntity<>(err.getMessage(),HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(new Campanha(),HttpStatus.UNAUTHORIZED);
         } catch (CampaignException err) {
 
-            return new ResponseEntity<>(err.getMessage(),HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new Campanha(),HttpStatus.NOT_FOUND);
         }
     }
 
-    @ApiOperation(value = "Permite que o dono atualize o status de uma campanha sua.", notes = "Atualização de Campanha Válida.")
+    @ApiOperation(value = "Permite que o dono atualize o status de uma campanha sua.", notes = "Atualização de Campanha Válida. Somente o Usuário dono da campanha, com um token válido, tem acesso a essa funcionalidade." +
+                          "A funcionalidade está mapeada com a URL de identificação única da campanha, e recebe como parâmetro, o novo status da campanha, no formato 'application/text'.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Retorna status de sucesso confirmando o êxito da operação."),
             @ApiResponse(code = 401, message = "O token de usuário recebido não é válido ou o usuário não tem permissão para acesso a tal funcionalidade."),
@@ -106,7 +108,8 @@ public class CampanhasController {
         }
     }
 
-    @ApiOperation(value = "Retorna um ranking com 5 disciplinas ordenadas por um determinado criterio de ordenação.", notes = "Atualização de Campanha Válida.")
+    @ApiOperation(value = "Retorna um ranking com 5 disciplinas ordenadas por um determinado criterio de ordenação.", notes = "Retorno de Campanhas Válidas. Essa funcionalidade pode ser acessada sem um usuário estar logado. " +
+                          "O método recebe como parâmetro uma string que indica qual o critério de ordenação desejado pelo usuário que solicita a visualização das campanhas. O método sempre retorna no máximo 5 campanhas.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Retorna status de sucesso confirmando o êxito da operação."),
     })
@@ -116,7 +119,8 @@ public class CampanhasController {
         return new ResponseEntity<List<Campanha>>(campanhasService.retornarCampanhasOrdenadas(parametroOrdenacao), HttpStatus.OK);
     }
 
-    @ApiOperation(value = "Adiciona uma nova campanha no sistema", notes = "Adição de Campanha Válida.")
+    @ApiOperation(value = "Adiciona uma nova campanha no sistema", notes = "Adição de Campanha Válida. O método recebe como parâmetro, todos os dados essenciais para a criação de uma nova campanha. Somente um usuário devidamente " +
+                          "autenticado pode adicionar uma nova campanha. Se a campanha for adicionada com êxito, a mesma é retornada. Retorna uma campanha vazia caso a operação não seja concluida com êxito.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Retorna status de sucesso confirmando o êxito da operação."),
             @ApiResponse(code = 401, message = "O token de usuário recebido não é válido ou o usuário não tem permissão para acesso a tal funcionalidade."),
@@ -138,13 +142,14 @@ public class CampanhasController {
         }
     }
 
-    @ApiOperation(value = "Retorna uma listagem de campanhas que sejam identificadas a partir de uma certa substring.", notes = "Busca de Campanhas Válidas.")
+    @ApiOperation(value = "Retorna uma listagem de campanhas que sejam identificadas a partir de uma certa substring.", notes = "Busca de Campanhas Válidas. Somente um usuário autenticado pode acessar essa funcionalidade." +
+                          "O método necessita da substring que será usada na pesquisa e de parâmetros adicionais que irão informar as campanhas em determinados status que devem ser incluidas na busca. A funcionalidade retorna uma lista com todas as campanhas que atendem aos parâmetros de busca.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Retorna status de sucesso confirmando o êxito da operação."),
             @ApiResponse(code = 401, message = "O token de usuário recebido não é válido ou o usuário não tem permissão para acesso a tal funcionalidade."),
     })
     @RequestMapping(value = "/buscaSubstring", method = RequestMethod.GET, produces = "application/json", consumes = "application/json")
-    public ResponseEntity<List<Campanha>> buscaCampanhaPorSubstring(@ApiParam("Token válido do usuário.") @RequestHeader("Authorization") String header, @ApiParam("Listagem de paramêtros para a busca.") @RequestBody List<String> parametrosBusca) {
+    public ResponseEntity<List<Campanha>> buscaCampanhaPorSubstring(@ApiParam("Token válido do usuário.") @RequestHeader("Authorization") String header, @ApiParam("Listagem de parâmetros para a busca.") @RequestBody List<String> parametrosBusca) {
 
         try {
 
@@ -164,7 +169,10 @@ public class CampanhasController {
         }
     }
 
-    @ApiOperation(value = "Adiciona um comentário/ ou resposta em uma campanha.", notes = "Adição de comentário em Campanha Válida.")
+    @ApiOperation(value = "Adiciona um comentário/resposta em uma campanha.", notes = "Adição de comentário em Campanha Válida. Recebe como parâmetro, uma lista de strings contendo os dados essenciais para a criação de um comentário, caso seja uma resposta, um parâmetro adicional é " +
+                          "enviado indicando que é um comentário 'resposta' e será linkado a outro comentário pela interface do frontend. Ordem de parâmetros: [comentario / resposta, conteudo, idComentario]. O primeiro parâmetro indica se é um comentário ou resposta, o segundo " +
+                          "parâmetro indica o conteúdo do comentário, e o último parâmetro indica o id do comentário que receberá a resposta, opcional se for um comentário. Essa funcionalidade só pode ser acessada por um usuário devidamente autenticado. Caso os parâmetros recebidos vejam incompletos, " +
+                          "a operação não é concluida, retornando uma campanha nula. A campanha alvo do novo comentário é mapeada na função pela sua URL de identificação unica. Retorna uma campanha vazia caso a operação não seja concluida com êxito.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Retorna status de sucesso confirmando o êxito da operação."),
             @ApiResponse(code = 401, message = "O token de usuário recebido não é válido ou o usuário não tem permissão para acesso a tal funcionalidade."),
@@ -194,13 +202,14 @@ public class CampanhasController {
         }
     }
 
-    @ApiOperation(value = "Deleta um comentário em uma campanha.", notes = "Remoção de comentário em Campanha Válida.")
+    @ApiOperation(value = "Deleta um comentário em uma campanha.", notes = "Remoção de comentário em Campanha Válida. Essa funcionalidade só pode ser acessada por um usuário autenticado. A funcionalidade é mapeada pela URL de identificação única da campanha, " +
+                          "recebe como parâmetro, o id único do comentário a ser ocultado, já que os comentários permanecem salvos no banco da dados. Retorna uma campanha vazia caso a operação não seja concluida com êxito.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Retorna status de sucesso confirmando o êxito da operação."),
             @ApiResponse(code = 401, message = "O token de usuário recebido não é válido ou o usuário não tem permissão para acesso a tal funcionalidade."),
             @ApiResponse(code = 404, message = "A campanha não foi encontrada!"),
     })
-    @RequestMapping(value = "{identificadorURL}/delComentario", method = RequestMethod.DELETE, produces = "application/json", consumes = "application/json")
+    @RequestMapping(value = "{identificadorURL}/delComentario", method = RequestMethod.DELETE, produces = "application/json", consumes = "application/text")
     public ResponseEntity<Campanha> deletarComentario(@ApiParam("Token válido de usuário.") @RequestHeader("Authorization") String header,@ApiParam("Identificador URL da campanha.") @PathVariable String identificadorURL, @ApiParam("Id do comentário a ser deletado.") @RequestBody String idComentario) {
 
         try {
@@ -221,7 +230,8 @@ public class CampanhasController {
         }
     }
 
-    @ApiOperation(value = "Adiciona um like em uma campanha.", notes = "Adição de Like em Campanha Válida.")
+    @ApiOperation(value = "Adiciona um like em uma campanha.", notes = "Adição de Like em Campanha Válida. É necessário que o usuário esteja autenticado para acessar tal funcionalidade. A funcionalidade está mapeada pela URL de identificação única da campanha, " +
+                          "sendo assim não necessita de parâmetros adicionais para computar o like. Retorna uma campanha nula caso alguma complicação impeça a adição do like. Um usuário não pode dar mais de um like.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Retorna status de sucesso confirmando o êxito da operação."),
             @ApiResponse(code = 401, message = "O token de usuário recebido não é válido ou o usuário não tem permissão para acesso a tal funcionalidade."),
@@ -247,7 +257,8 @@ public class CampanhasController {
         }
     }
 
-    @ApiOperation(value = "Deleta um like em uma campanha.", notes = "Remoção de Like em Campanha Válida.")
+    @ApiOperation(value = "Deleta um like em uma campanha.", notes = "Remoção de Like em Campanha Válida. É necessário que o usuário esteja autenticado para acessar tal funcionalidade. A funcionalidade está mapeada pela URL de identificação única da campanha, " +
+                          "sendo assim não necessita de parâmetros adicionais para computar a remoção do like. Retorna uma campanha nula caso alguma complicação impeça a remoção do like.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Retorna status de sucesso confirmando o êxito da operação."),
             @ApiResponse(code = 401, message = "O token de usuário recebido não é válido ou o usuário não tem permissão para acesso a tal funcionalidade."),
@@ -273,29 +284,30 @@ public class CampanhasController {
         }
     }
 
-    @ApiOperation(value = "Realiza uma doação para uma campanha especifica.", notes = "Adição de uma Doação em Campanha Válida.")
+    @ApiOperation(value = "Realiza uma doação para uma campanha especifica.", notes = "Adição de uma Doação em Campanha Válida. É necessário que o usuário esteja autenticado para acessar tal funcionalidade. A funcionalidade está mapeada pela URL de identificação única da campanha, " +
+                          "recebe um parâmetro adicional para indicar o valor que está sendo doado. Retorna uma campanha nula caso alguma complicação impeça a adição da doação.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Retorna status de sucesso confirmando o êxito da operação."),
             @ApiResponse(code = 401, message = "O token de usuário recebido não é válido ou o usuário não tem permissão para acesso a tal funcionalidade."),
             @ApiResponse(code = 404, message = "A campanha não foi encontrada!"),
     })
     @RequestMapping(value = "{identificadorURL}/doacao", method = RequestMethod.POST, produces = "application/json", consumes = "application/json")
-    public ResponseEntity realizarDoacao(@ApiParam("Token do Usuário que está fazendo a doação.") @RequestHeader("Authorization") String header,@ApiParam("Campanha alvo da doação.") @PathVariable String identificadorURL,@ApiParam("Valor da doação.") @RequestBody Double doacao) {
+    public ResponseEntity<Campanha> realizarDoacao(@ApiParam("Token do Usuário que está fazendo a doação.") @RequestHeader("Authorization") String header,@ApiParam("Campanha alvo da doação.") @PathVariable String identificadorURL,@ApiParam("Valor da doação.") @RequestBody Double doacao) {
 
         try {
 
             if(jwtService.usuarioExiste(header)) {
 
-                return new ResponseEntity<Double>(campanhasService.realizarDoacao(jwtService.getUsuarioDoToken(header), identificadorURL, doacao), HttpStatus.CREATED);
+                return new ResponseEntity<>(campanhasService.realizarDoacao(jwtService.getUsuarioDoToken(header), identificadorURL, doacao), HttpStatus.CREATED);
             }
 
             throw new UserNotFoundException();
         } catch (UserException err) {
 
-            return new ResponseEntity<>(err.getMessage(), HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(new Campanha(), HttpStatus.UNAUTHORIZED);
         } catch (CampaignException err) {
 
-            return new ResponseEntity<>(err.getMessage(), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new Campanha(), HttpStatus.NOT_FOUND);
         }
     }
 }

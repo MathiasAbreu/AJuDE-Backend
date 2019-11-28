@@ -1,8 +1,6 @@
 package br.com.psoft.ajude.services;
 
 import br.com.psoft.ajude.entities.Usuario;
-import br.com.psoft.ajude.exceptions.UserException;
-import br.com.psoft.ajude.exceptions.UserNotFoundException;
 import com.sendgrid.Content;
 import com.sendgrid.Email;
 import com.sendgrid.Mail;
@@ -18,7 +16,7 @@ public class EmailService extends HttpServlet {
     public static void service(Usuario usuario) {
 
         final String sendgridApiKey = "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";
-        final String sendgridSender = "ajude_application@ufcg.edu.br";
+        final String sendgridSender = "Ajude";
 
         final String toEmail = usuario.getEmail();
 

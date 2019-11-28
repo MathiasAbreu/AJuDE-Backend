@@ -18,7 +18,6 @@ public class Doacao {
 
     @ManyToOne
     @JoinColumn(name = "id")
-    @JsonIgnore
     private Campanha campanhaAlvo;
 
     @ManyToOne
@@ -63,6 +62,7 @@ public class Doacao {
         this.valorDoado = valorDoado;
     }
 
+    @JsonIgnore
     public Campanha getCampanhaAlvo() {
         return campanhaAlvo;
     }

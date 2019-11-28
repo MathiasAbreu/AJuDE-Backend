@@ -53,33 +53,33 @@ public class CampanhasService {
         throw new CampaignNotFoundException(identificadorURL);
     }
 
-    public void atualizaDescricaoCampanha(String usuario, String identificadorURL, String novaDescricao) throws CampaignException, UserException {
+    public Campanha atualizaDescricaoCampanha(String usuario, String identificadorURL, String novaDescricao) throws CampaignException, UserException {
 
         Campanha campanha = buscaCampanha(identificadorURL);
 
         if(campanha.getUsuario().getEmail().equals(usuario)) {
-            campanhasDao.findById(campanha.getId()).map(record -> {
+            return campanhasDao.findById(campanha.getId()).map(record -> {
 
                 System.out.println(novaDescricao);
                 record.setDescricao(novaDescricao);
                 return campanhasDao.save(record);
-            });
+            }).get();
         }
 
         throw new UserNotAuthorizedForProcedure();
     }
 
-    public void atualizaStatusCampanha(String usuario, String identificadorURL, String novoStatus) throws CampaignException, UserException {
+    public Campanha atualizaStatusCampanha(String usuario, String identificadorURL, String novoStatus) throws CampaignException, UserException {
 
         Campanha campanha = buscaCampanha(identificadorURL);
 
         if(campanha.getUsuario().getEmail().equals(usuario)) {
 
-            campanhasDao.findById(campanha.getId()).map(record -> {
+            return campanhasDao.findById(campanha.getId()).map(record -> {
 
                 record.setStatus(novoStatus);
                 return campanhasDao.save(record);
-            });
+            }).get();
         }
 
         throw new UserNotAuthorizedForProcedure();
@@ -259,7 +259,7 @@ public class CampanhasService {
         return campanha;
     }
 
-    public double realizarDoacao(String emailUsuario, String identificadorURL, Double valorDoado) throws CampaignException, UserException {
+    public Campanha realizarDoacao(String emailUsuario, String identificadorURL, Double valorDoado) throws CampaignException, UserException {
 
         Optional<Usuario> usuario = usuariosDao.findById(emailUsuario);
 
@@ -270,20 +270,18 @@ public class CampanhasService {
         Doacao doacao = new Doacao(campanha,usuario.get(),valorDoado);
 
         doacao = doacoesDao.save(doacao);
-        double retorno = adicionarDoacaoNaCampanha(campanha,doacao);
         adicionarDoacaoNoUsuario(usuario.get(), doacao);
-
-        return retorno;
+        return adicionarDoacaoNaCampanha(campanha,doacao);
 
     }
 
-    private double adicionarDoacaoNaCampanha(Campanha campanha, Doacao doacao) {
+    private Campanha adicionarDoacaoNaCampanha(Campanha campanha, Doacao doacao) {
 
         return campanhasDao.findById(campanha.getId()).map(record -> {
 
             record.adicionaDoacao(doacao);
-            campanhasDao.save(record);
-            return record.valorRestante();
+            return campanhasDao.save(record);
+
         }).get();
     }
 
@@ -294,6 +292,22 @@ public class CampanhasService {
             record.adicionaDoacao(doacao);
             return usuariosDao.save(record);
         });
+    }
+
+    public List<Campanha> retornaCampanhasDoUsuario(String emailUser) {
+
+        return usuariosDao.findById(emailUser).get().getCampanhas();
+    }
+
+    public List<Campanha> retornaCampanhasContribuidas(String emailUser) {
+
+        List<Doacao> doacoes = usuariosDao.findById(emailUser).get().getDoacoes();
+        List<Campanha> campanhas = new ArrayList<>();
+
+        for(Doacao doacao : doacoes)
+            campanhas.add(doacao.getCampanhaAlvo());
+
+        return campanhas;
     }
 
     public List<Campanha> retornarCampanhasOrdenadas(String parametroOrdenacao) {
